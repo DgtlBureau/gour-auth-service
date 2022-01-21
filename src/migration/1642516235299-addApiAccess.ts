@@ -1,7 +1,7 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class addApiAccess1642517435299 implements MigrationInterface {
-    name = 'addApiAccess1642517435299'
+export class addApiAccess1642516235299 implements MigrationInterface {
+    name = 'addApiAccess1642516235299'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "api_access" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "createdAt" datetime NOT NULL DEFAULT (datetime('now')), "updatedAt" datetime NOT NULL DEFAULT (datetime('now')), "key" varchar NOT NULL, "description" varchar)`);
