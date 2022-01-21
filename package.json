@@ -1,0 +1,66 @@
+{
+  "name": "typeorm-typescript-koa-example",
+  "version": "0.0.1",
+  "description": "Example how to use Koa and TypeORM with TypeScript.",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "author": {
+    "name": "Umed Khudoiberdiev",
+    "email": "pleerock.me@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/typeorm/typescript-koa-example.git"
+  },
+  "bugs": {
+    "url": "https://github.com/typeorm/typescript-koa-example/issues"
+  },
+  "tags": [
+    "orm",
+    "typescript",
+    "typescript-orm",
+    "typeorm-sample",
+    "typeorm-example",
+    "typeorm-koa-example"
+  ],
+  "devDependencies": {
+    "@types/koa": "^2.13.4",
+    "@types/koa-bodyparser": "^4.3.3",
+    "@types/koa-router": "^7.4.4",
+    "@types/node": "^16.11.6",
+    "typescript": "^4.4.4"
+  },
+  "dependencies": {
+    "@koa/cors": "^3.1.0",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/jsonwebtoken": "^8.5.5",
+    "axios": "^0.24.0",
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^7.4.6",
+    "class-validator": "^0.12.2",
+    "date-fns": "^2.27.0",
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.13.4",
+    "koa-bodyparser": "^4.3.0",
+    "koa-mount": "^4.0.0",
+    "koa-router": "^10.1.1",
+    "koa-static": "^5.0.0",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.14",
+    "pg": "^8.7.1",
+    "routing-controllers": "^0.9.0",
+    "routing-controllers-openapi": "^3.1.0",
+    "sqlite3": "^5.0.2",
+    "ts-node": "^10.4.0",
+    "typeorm": "^0.2.38"
+  },
+  "scripts": {
+    "build": "tsc",
+    "serve": "NODE_ENV=production node dist/index.js production",
+    "build-config": "ts-node src/index.ts config",
+    "start": "nodemon src/index.ts",
+    "generate-token": "ts-node generateToken.ts",
+    "migration:generate": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:generate -n",
+    "migration:migrate": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:run"
+  }
+}
