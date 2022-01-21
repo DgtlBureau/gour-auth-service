@@ -1,5 +1,5 @@
 {
-  "name": "typeorm-typescript-koa-example",
+  "name": "bio-auth",
   "version": "0.0.1",
   "description": "Example how to use Koa and TypeORM with TypeScript.",
   "license": "MIT",

@@ -1,8 +1,10 @@
+const pack = require('./package.json');
+
 module.exports = {
   apps: [
     {
-      name: 'bio-specialist-back',
-      script: 'dist/index',
+      name: `${pack.name}@${pack.version}`,
+      script: 'dist/index.js',
       instances: 1,
       autorestart: true,
       watch: false,
