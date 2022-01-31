@@ -1,27 +1,20 @@
 {
-  "name": "bio-auth",
+  "name": "thermostat-auth",
   "version": "0.0.1",
-  "description": "Example how to use Koa and TypeORM with TypeScript.",
+  "description": "Auth microservice",
   "license": "MIT",
   "readmeFilename": "README.md",
   "author": {
-    "name": "Umed Khudoiberdiev",
-    "email": "pleerock.me@gmail.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/typeorm/typescript-koa-example.git"
-  },
-  "bugs": {
-    "url": "https://github.com/typeorm/typescript-koa-example/issues"
+    "name": "Zolkin Kirill",
+    "email": "zolkinka@newshift.ru"
   },
   "tags": [
-    "orm",
+    "auth",
+    "nodejs-auth",
+    "koa-auth",
+    "typescript-auth",
     "typescript",
-    "typescript-orm",
-    "typeorm-sample",
-    "typeorm-example",
-    "typeorm-koa-example"
+    "koa"
   ],
   "devDependencies": {
     "@types/koa": "^2.13.4",
@@ -51,7 +44,8 @@
     "routing-controllers-openapi": "^3.1.0",
     "sqlite3": "^5.0.2",
     "ts-node": "^10.4.0",
-    "typeorm": "^0.2.38"
+    "typeorm": "^0.2.38",
+    "uuid": "^8.3.2"
   },
   "scripts": {
     "build": "tsc",

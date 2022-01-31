@@ -3,6 +3,7 @@ import {ApiRole} from "../entity/ApiRole";
 import {ApiAccess} from "../entity/ApiAccess";
 import {ApiUser} from "../entity/ApiUser";
 import * as bcrypt from "bcryptjs";
+import { v4 as uuidv4 } from 'uuid';
 
 export class SeedApiRole1642516368621 implements MigrationInterface {
 

@@ -1,12 +1,11 @@
 import jwt from 'jsonwebtoken';
+import {ApiUser} from "../entity/ApiUser";
 
 const SECRET = process.env.ACCESS_TOKEN_SECRET;
 const SECRET_REFRESH = process.env.REFRESH_TOKEN_SECRET;
 
 export function encodeJwt(obj: object) {
-    return jwt.sign(obj, SECRET, {
-        expiresIn: '4h'
-    });
+    return jwt.sign(obj, SECRET);
 }
 
 export function encodeUnlimitedJwt() {

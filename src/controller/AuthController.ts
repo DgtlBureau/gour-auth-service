@@ -3,7 +3,7 @@ import {
     Post,
     JsonController,
     HttpError,
-    Ctx, CookieParam, CurrentUser, Patch
+    Ctx, CookieParam, CurrentUser, Patch, Get
 } from 'routing-controllers'
 import { getManager, Repository } from 'typeorm'
 import * as bcrypt from 'bcryptjs'
@@ -21,6 +21,33 @@ export class AuthController {
     async checkToken (@Body() body: { token: string; }, @Ctx() ctx: Context) {
         return {
             result: verifyJwt(body.token),
+        };
+    }
+
+    @Post('/checkAccess')
+    async checkAccess (@Body() body: {
+        token: string;
+        accesses: string[];
+        }, @Ctx() ctx: Context) {
+        if(!verifyJwt(body.token)) {
+            throw new HttpError(401, 'Bad credentials')
+        }
+
+        const decoded = decodeToken(body.token) as {accesses: string[]}
+
+        return {
+            result: body.accesses.some(a => decoded.accesses.includes(a))
+        };
+    }
+
+    @Get('/currentUser')
+    async getCurrentUser (@Body() body: { token: string; }, @Ctx() ctx: Context) {
+        if(!verifyJwt(body.token)) {
+            throw new HttpError(401, 'Bad credentials')
+        }
+
+        return {
+            result: decodeToken(body.token),
         };
     }
 
@@ -132,6 +159,7 @@ export class AuthController {
     generateTokens (user: Partial<ApiUser>, accesses: string[], ctx: Context) {
         const token = encodeJwt({
             id: user.id,
+            uuid: user.uuid,
             login: user.login,
             accesses,
         })

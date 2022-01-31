@@ -1,7 +1,7 @@
 import {
     BeforeInsert,
-    BeforeUpdate,
-    CreateDateColumn,
+    BeforeUpdate, Column,
+    CreateDateColumn, Generated, Index,
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
@@ -9,6 +9,13 @@ import {
 export class AppEntity {
     @PrimaryGeneratedColumn()
     id: number;
+
+    @Index()
+    @Column({
+        type: 'uuid'
+    })
+    @Generated("uuid")
+    uuid: string;
 
     @CreateDateColumn()
     createdAt: Date;

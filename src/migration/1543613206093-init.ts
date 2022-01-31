@@ -1,26 +1,26 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class addApiAccess1642516235299 implements MigrationInterface {
-    name = 'addApiAccess1642516235299'
+export class init1543613206093 implements MigrationInterface {
+    name = 'init1543613206093'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`CREATE TABLE "api_access" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "createdAt" datetime NOT NULL DEFAULT (datetime('now')), "updatedAt" datetime NOT NULL DEFAULT (datetime('now')), "key" varchar NOT NULL, "description" varchar)`);
+        await queryRunner.query(`CREATE TABLE "api_access" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "uuid" varchar NOT NULL, "createdAt" datetime NOT NULL DEFAULT (datetime('now')), "updatedAt" datetime NOT NULL DEFAULT (datetime('now')), "key" varchar NOT NULL, "description" varchar)`);
+        await queryRunner.query(`CREATE INDEX "IDX_e7a69e8255c84bc9c29fa5f380" ON "api_access" ("uuid") `);
         await queryRunner.query(`CREATE UNIQUE INDEX "IDX_6a66515fcc6b585a69df6b5080" ON "api_access" ("key") `);
+        await queryRunner.query(`CREATE TABLE "api_role" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "uuid" varchar NOT NULL, "createdAt" datetime NOT NULL DEFAULT (datetime('now')), "updatedAt" datetime NOT NULL DEFAULT (datetime('now')), "key" varchar NOT NULL, "description" varchar)`);
+        await queryRunner.query(`CREATE INDEX "IDX_b436ec5f54034abae23058c8dd" ON "api_role" ("uuid") `);
+        await queryRunner.query(`CREATE UNIQUE INDEX "IDX_84cd2b524a3927f57101efebeb" ON "api_role" ("key") `);
+        await queryRunner.query(`CREATE TABLE "api_user" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "uuid" varchar NOT NULL, "createdAt" datetime NOT NULL DEFAULT (datetime('now')), "updatedAt" datetime NOT NULL DEFAULT (datetime('now')), "login" varchar NOT NULL, "password" varchar NOT NULL, "name" varchar)`);
+        await queryRunner.query(`CREATE INDEX "IDX_d602d607f393ba0b041bfe2516" ON "api_user" ("uuid") `);
         await queryRunner.query(`CREATE TABLE "api_role_accesses_api_access" ("apiRoleId" integer NOT NULL, "apiAccessId" integer NOT NULL, PRIMARY KEY ("apiRoleId", "apiAccessId"))`);
         await queryRunner.query(`CREATE INDEX "IDX_e978192586e242c403d89fcff9" ON "api_role_accesses_api_access" ("apiRoleId") `);
         await queryRunner.query(`CREATE INDEX "IDX_17b639fb5514fa530ae0e0fbee" ON "api_role_accesses_api_access" ("apiAccessId") `);
         await queryRunner.query(`CREATE TABLE "api_role_extends_api_role" ("apiRoleId_1" integer NOT NULL, "apiRoleId_2" integer NOT NULL, PRIMARY KEY ("apiRoleId_1", "apiRoleId_2"))`);
         await queryRunner.query(`CREATE INDEX "IDX_c5260028920467c71f49e083f1" ON "api_role_extends_api_role" ("apiRoleId_1") `);
         await queryRunner.query(`CREATE INDEX "IDX_97d7bb4d8af2f02979e8decf9d" ON "api_role_extends_api_role" ("apiRoleId_2") `);
-        await queryRunner.query(`CREATE TABLE "temporary_api_role" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "createdAt" datetime NOT NULL DEFAULT (datetime('now')), "updatedAt" datetime NOT NULL DEFAULT (datetime('now')))`);
-        await queryRunner.query(`INSERT INTO "temporary_api_role"("id", "createdAt", "updatedAt") SELECT "id", "createdAt", "updatedAt" FROM "api_role"`);
-        await queryRunner.query(`DROP TABLE "api_role"`);
-        await queryRunner.query(`ALTER TABLE "temporary_api_role" RENAME TO "api_role"`);
-        await queryRunner.query(`CREATE TABLE "temporary_api_role" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "createdAt" datetime NOT NULL DEFAULT (datetime('now')), "updatedAt" datetime NOT NULL DEFAULT (datetime('now')), "key" varchar NOT NULL, "description" varchar)`);
-        await queryRunner.query(`INSERT INTO "temporary_api_role"("id", "createdAt", "updatedAt") SELECT "id", "createdAt", "updatedAt" FROM "api_role"`);
-        await queryRunner.query(`DROP TABLE "api_role"`);
-        await queryRunner.query(`ALTER TABLE "temporary_api_role" RENAME TO "api_role"`);
-        await queryRunner.query(`CREATE UNIQUE INDEX "IDX_84cd2b524a3927f57101efebeb" ON "api_role" ("key") `);
+        await queryRunner.query(`CREATE TABLE "api_user_roles_api_role" ("apiUserId" integer NOT NULL, "apiRoleId" integer NOT NULL, PRIMARY KEY ("apiUserId", "apiRoleId"))`);
+        await queryRunner.query(`CREATE INDEX "IDX_3a8e26eba4f136ed858ffd4c5c" ON "api_user_roles_api_role" ("apiUserId") `);
+        await queryRunner.query(`CREATE INDEX "IDX_8e8af423cccc0c05997336b95b" ON "api_user_roles_api_role" ("apiRoleId") `);
         await queryRunner.query(`DROP INDEX "IDX_e978192586e242c403d89fcff9"`);
         await queryRunner.query(`DROP INDEX "IDX_17b639fb5514fa530ae0e0fbee"`);
         await queryRunner.query(`CREATE TABLE "temporary_api_role_accesses_api_access" ("apiRoleId" integer NOT NULL, "apiAccessId" integer NOT NULL, CONSTRAINT "FK_e978192586e242c403d89fcff97" FOREIGN KEY ("apiRoleId") REFERENCES "api_role" ("id") ON DELETE CASCADE ON UPDATE CASCADE, CONSTRAINT "FK_17b639fb5514fa530ae0e0fbee7" FOREIGN KEY ("apiAccessId") REFERENCES "api_access" ("id") ON DELETE CASCADE ON UPDATE CASCADE, PRIMARY KEY ("apiRoleId", "apiAccessId"))`);
@@ -37,9 +37,25 @@ export class addApiAccess1642516235299 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "temporary_api_role_extends_api_role" RENAME TO "api_role_extends_api_role"`);
         await queryRunner.query(`CREATE INDEX "IDX_c5260028920467c71f49e083f1" ON "api_role_extends_api_role" ("apiRoleId_1") `);
         await queryRunner.query(`CREATE INDEX "IDX_97d7bb4d8af2f02979e8decf9d" ON "api_role_extends_api_role" ("apiRoleId_2") `);
+        await queryRunner.query(`DROP INDEX "IDX_3a8e26eba4f136ed858ffd4c5c"`);
+        await queryRunner.query(`DROP INDEX "IDX_8e8af423cccc0c05997336b95b"`);
+        await queryRunner.query(`CREATE TABLE "temporary_api_user_roles_api_role" ("apiUserId" integer NOT NULL, "apiRoleId" integer NOT NULL, CONSTRAINT "FK_3a8e26eba4f136ed858ffd4c5c8" FOREIGN KEY ("apiUserId") REFERENCES "api_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE, CONSTRAINT "FK_8e8af423cccc0c05997336b95bc" FOREIGN KEY ("apiRoleId") REFERENCES "api_role" ("id") ON DELETE CASCADE ON UPDATE CASCADE, PRIMARY KEY ("apiUserId", "apiRoleId"))`);
+        await queryRunner.query(`INSERT INTO "temporary_api_user_roles_api_role"("apiUserId", "apiRoleId") SELECT "apiUserId", "apiRoleId" FROM "api_user_roles_api_role"`);
+        await queryRunner.query(`DROP TABLE "api_user_roles_api_role"`);
+        await queryRunner.query(`ALTER TABLE "temporary_api_user_roles_api_role" RENAME TO "api_user_roles_api_role"`);
+        await queryRunner.query(`CREATE INDEX "IDX_3a8e26eba4f136ed858ffd4c5c" ON "api_user_roles_api_role" ("apiUserId") `);
+        await queryRunner.query(`CREATE INDEX "IDX_8e8af423cccc0c05997336b95b" ON "api_user_roles_api_role" ("apiRoleId") `);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`DROP INDEX "IDX_8e8af423cccc0c05997336b95b"`);
+        await queryRunner.query(`DROP INDEX "IDX_3a8e26eba4f136ed858ffd4c5c"`);
+        await queryRunner.query(`ALTER TABLE "api_user_roles_api_role" RENAME TO "temporary_api_user_roles_api_role"`);
+        await queryRunner.query(`CREATE TABLE "api_user_roles_api_role" ("apiUserId" integer NOT NULL, "apiRoleId" integer NOT NULL, PRIMARY KEY ("apiUserId", "apiRoleId"))`);
+        await queryRunner.query(`INSERT INTO "api_user_roles_api_role"("apiUserId", "apiRoleId") SELECT "apiUserId", "apiRoleId" FROM "temporary_api_user_roles_api_role"`);
+        await queryRunner.query(`DROP TABLE "temporary_api_user_roles_api_role"`);
+        await queryRunner.query(`CREATE INDEX "IDX_8e8af423cccc0c05997336b95b" ON "api_user_roles_api_role" ("apiRoleId") `);
+        await queryRunner.query(`CREATE INDEX "IDX_3a8e26eba4f136ed858ffd4c5c" ON "api_user_roles_api_role" ("apiUserId") `);
         await queryRunner.query(`DROP INDEX "IDX_97d7bb4d8af2f02979e8decf9d"`);
         await queryRunner.query(`DROP INDEX "IDX_c5260028920467c71f49e083f1"`);
         await queryRunner.query(`ALTER TABLE "api_role_extends_api_role" RENAME TO "temporary_api_role_extends_api_role"`);
@@ -56,22 +72,22 @@ export class addApiAccess1642516235299 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE "temporary_api_role_accesses_api_access"`);
         await queryRunner.query(`CREATE INDEX "IDX_17b639fb5514fa530ae0e0fbee" ON "api_role_accesses_api_access" ("apiAccessId") `);
         await queryRunner.query(`CREATE INDEX "IDX_e978192586e242c403d89fcff9" ON "api_role_accesses_api_access" ("apiRoleId") `);
-        await queryRunner.query(`DROP INDEX "IDX_84cd2b524a3927f57101efebeb"`);
-        await queryRunner.query(`ALTER TABLE "api_role" RENAME TO "temporary_api_role"`);
-        await queryRunner.query(`CREATE TABLE "api_role" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "createdAt" datetime NOT NULL DEFAULT (datetime('now')), "updatedAt" datetime NOT NULL DEFAULT (datetime('now')))`);
-        await queryRunner.query(`INSERT INTO "api_role"("id", "createdAt", "updatedAt") SELECT "id", "createdAt", "updatedAt" FROM "temporary_api_role"`);
-        await queryRunner.query(`DROP TABLE "temporary_api_role"`);
-        await queryRunner.query(`ALTER TABLE "api_role" RENAME TO "temporary_api_role"`);
-        await queryRunner.query(`CREATE TABLE "api_role" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "createdAt" datetime NOT NULL DEFAULT (datetime('now')), "updatedAt" datetime NOT NULL DEFAULT (datetime('now')), "name" varchar NOT NULL, "accesses" text NOT NULL)`);
-        await queryRunner.query(`INSERT INTO "api_role"("id", "createdAt", "updatedAt") SELECT "id", "createdAt", "updatedAt" FROM "temporary_api_role"`);
-        await queryRunner.query(`DROP TABLE "temporary_api_role"`);
+        await queryRunner.query(`DROP INDEX "IDX_8e8af423cccc0c05997336b95b"`);
+        await queryRunner.query(`DROP INDEX "IDX_3a8e26eba4f136ed858ffd4c5c"`);
+        await queryRunner.query(`DROP TABLE "api_user_roles_api_role"`);
         await queryRunner.query(`DROP INDEX "IDX_97d7bb4d8af2f02979e8decf9d"`);
         await queryRunner.query(`DROP INDEX "IDX_c5260028920467c71f49e083f1"`);
         await queryRunner.query(`DROP TABLE "api_role_extends_api_role"`);
         await queryRunner.query(`DROP INDEX "IDX_17b639fb5514fa530ae0e0fbee"`);
         await queryRunner.query(`DROP INDEX "IDX_e978192586e242c403d89fcff9"`);
         await queryRunner.query(`DROP TABLE "api_role_accesses_api_access"`);
+        await queryRunner.query(`DROP INDEX "IDX_d602d607f393ba0b041bfe2516"`);
+        await queryRunner.query(`DROP TABLE "api_user"`);
+        await queryRunner.query(`DROP INDEX "IDX_84cd2b524a3927f57101efebeb"`);
+        await queryRunner.query(`DROP INDEX "IDX_b436ec5f54034abae23058c8dd"`);
+        await queryRunner.query(`DROP TABLE "api_role"`);
         await queryRunner.query(`DROP INDEX "IDX_6a66515fcc6b585a69df6b5080"`);
+        await queryRunner.query(`DROP INDEX "IDX_e7a69e8255c84bc9c29fa5f380"`);
         await queryRunner.query(`DROP TABLE "api_access"`);
     }
 
