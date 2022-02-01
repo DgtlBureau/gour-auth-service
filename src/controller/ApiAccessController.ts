@@ -21,9 +21,9 @@ export class ApiAccessController {
         return this.apiAccessRepository.find();
     }
 
-    @Get('/apiAccess/:id')
-    getOne(@Param('id') id: number) {
-        return this.apiAccessRepository.findOne({id})
+    @Get('/apiAccess/:uuid')
+    getOne(@Param('uuid') uuid: string) {
+        return this.apiAccessRepository.findOne({ uuid })
     }
 
     @Post('/apiAccess')

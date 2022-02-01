@@ -21,9 +21,9 @@ export class ApiUserController {
         return this.apiUserRepository.find();
     }
 
-    @Get('/apiUsers/:id')
-    getOne(@Param('id') id: number) {
-        return this.apiUserRepository.findOne({id})
+    @Get('/apiUsers/:uuid')
+    getOne(@Param('uuid') uuid: string) {
+        return this.apiUserRepository.findOne({ uuid })
     }
 
     @Post('/apiUsers')

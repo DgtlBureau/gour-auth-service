@@ -45,7 +45,7 @@ export class SignupController {
             })
 
             const payload = {
-                id: user.id,
+                uuid: user.uuid,
                 login: user.login,
                 referer
             }

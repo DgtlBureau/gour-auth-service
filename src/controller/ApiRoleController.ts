@@ -21,9 +21,9 @@ export class ApiRoleController {
         return this.apiRoleRepository.find();
     }
 
-    @Get('/apiRoles/:id')
-    getOne(@Param('id') id: number) {
-        return this.apiRoleRepository.findOne({id})
+    @Get('/apiRoles/:uuid')
+    getOne(@Param('uuid') uuid: string) {
+        return this.apiRoleRepository.findOne({ uuid })
     }
 
     @Post('/apiRoles')

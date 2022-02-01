@@ -80,14 +80,14 @@ export class AuthController {
         @Ctx() ctx: Context
     ) {
         const parsedRefresh = decodeToken(refreshToken) as {
-            userId: number
+            userUuid: string
         }
-        if (!parsedRefresh.userId) {
+        if (!parsedRefresh.userUuid) {
             throw new HttpError(401, 'Bad credentials')
         }
 
         const currentApiUser = await this.userRepository.findOne({
-            id: parsedRefresh.userId
+            uuid: parsedRefresh.userUuid
         })
 
         if (!currentApiUser || !verifyRefresh(refreshToken)) {
@@ -108,7 +108,7 @@ export class AuthController {
     }
 
     @Patch('/change-password')
-    async changePassword (@CurrentUser() user, @Body() changePasswordDto: {
+    async changePassword (@CurrentUser() user: ApiUser, @Body() changePasswordDto: {
         currentPassword: string;
         password: string;
         verificationPassword: string;
@@ -126,10 +126,10 @@ export class AuthController {
         }
 
         const hashPassword = await bcrypt.hash(changePasswordDto.password, 5)
-        await this.userRepository.update(user.id, {
+        await this.userRepository.update(user.uuid, {
             password: hashPassword
         })
-        const updatedApiUser = await this.userRepository.findOne(user.id)
+        const updatedApiUser = await this.userRepository.findOne(user.uuid)
 
         const accesses = AuthController.getAccessFromRoles(updatedApiUser.roles)
         return this.generateTokens(updatedApiUser, accesses, ctx)
@@ -137,14 +137,13 @@ export class AuthController {
 
     generateTokens (user: Partial<ApiUser>, accesses: string[], ctx: Context) {
         const token = encodeJwt({
-            id: user.id,
             uuid: user.uuid,
             login: user.login,
             accesses,
         })
         const refreshToken = encodeRefresh({
             refreshToken: 'true',
-            userId: user.id
+            userUuid: user.uuid
         })
         ctx.cookies.set('AccessToken', token, {
             maxAge: 4 * 60 * 60 * 1000,
