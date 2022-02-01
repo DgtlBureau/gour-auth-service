@@ -11,9 +11,9 @@ import {routingControllersToSpec} from "routing-controllers-openapi";
 import * as fs from "fs";
 import {AuthController} from "./controller/AuthController";
 import {ApiUserController} from "./controller/ApiUserController";
-import {ApiUser} from "./entity/ApiUser";
 import {ApiRoleController} from "./controller/ApiRoleController";
 import {ApiAccessController} from "./controller/ApiAccessController";
+import {SignupController} from "./controller/SignupController";
 
 const PORT = process.env.PORT || 5002;
 const args = process.argv.slice(2);
@@ -25,6 +25,7 @@ createConnection().then(async connection => {
             ApiUserController,
             ApiRoleController,
             ApiAccessController,
+            SignupController,
         ],
         authorizationChecker(action: Action, accesses: string[] = []) {
             const accessToken = action.context.cookies.get('AccessToken');

@@ -3,15 +3,23 @@ import {
     Post,
     JsonController,
     HttpError,
-    Ctx, CookieParam, CurrentUser, Patch, Get
+    Ctx, CookieParam, CurrentUser, Patch, Get, QueryParam, Redirect, Res
 } from 'routing-controllers'
 import { getManager, Repository } from 'typeorm'
 import * as bcrypt from 'bcryptjs'
 import { Context } from 'koa'
-import {decodeToken, encodeJwt, encodeRefresh, verifyJwt, verifyRefresh} from '../services/jwtService'
+import {
+    decodeToken,
+    encodeJwt,
+    encodeRefresh,
+    encodeVerificationToken,
+    verifyJwt,
+    verifyRefresh, verifyVerificationToken
+} from '../services/jwtService'
 import { HttpStatus } from '../constants/HttpStatus'
 import { ApiUser } from "../entity/ApiUser";
 import {ApiRole} from "../entity/ApiRole";
+import {emailService} from "../services/emailService";
 
 @JsonController()
 export class AuthController {
@@ -58,41 +66,12 @@ export class AuthController {
         })
 
 
-        if (user && await bcrypt.compare(credentials.password, user.password)) {
+        if (user && user.isApproved && await bcrypt.compare(credentials.password, user.password)) {
             const accesses = AuthController.getAccessFromRoles(user.roles)
             return this.generateTokens(user, accesses, ctx)
         }
 
         throw new HttpError(401, 'Bad credentials')
-    }
-
-    @Post('/signup')
-    async signup (@Body() dto: { login: string; password: string }, @Ctx() ctx: Context) {
-        const candidate = await this.userRepository.findOne({
-            login: dto.login
-        })
-
-        if (candidate) {
-            throw new HttpError(
-                HttpStatus.BAD_REQUEST,
-                'login:Пользователь с таким login существует'
-            )
-        }
-
-        const hashPassword = await bcrypt.hash(dto.password, 5)
-
-        const user = await this.userRepository.save({
-            ...dto,
-            password: hashPassword
-        })
-
-        const payload = {
-            id: user.id,
-            login: user.login
-        }
-
-        const accesses = AuthController.getAccessFromRoles(user.roles)
-        return this.generateTokens(payload, accesses, ctx)
     }
 
     @Post('/refresh')

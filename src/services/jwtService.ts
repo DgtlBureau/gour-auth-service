@@ -8,6 +8,14 @@ export function encodeJwt(obj: object) {
     return jwt.sign(obj, SECRET);
 }
 
+export function encodeVerificationToken(obj: object) {
+    return jwt.sign(obj, SECRET + SECRET_REFRESH);
+}
+
+export function verifyVerificationToken(token: string) {
+    return jwt.verify(token, SECRET + SECRET_REFRESH);
+}
+
 export function encodeUnlimitedJwt() {
     return jwt.sign({test: true}, SECRET);
 }

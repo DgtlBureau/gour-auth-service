@@ -28,4 +28,9 @@ export class ApiUser extends AppEntity {
     })
     @JoinTable()
     roles: ApiRole[];
+
+    @Column({
+        default: false,
+    })
+    isApproved: boolean;
 }

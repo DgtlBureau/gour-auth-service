@@ -7,14 +7,7 @@ import {
 } from "typeorm";
 
 export class AppEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
-
-    @Index()
-    @Column({
-        type: 'uuid'
-    })
-    @Generated("uuid")
+    @PrimaryGeneratedColumn("uuid")
     uuid: string;
 
     @CreateDateColumn()
