@@ -160,15 +160,15 @@ export class AuthController {
         ctx.cookies.set('AccessToken', token, {
             maxAge: 4 * 60 * 60 * 1000,
             httpOnly: true,
-            secure: true,
-            sameSite: 'none'
+            // secure: true,
+            // sameSite: 'none'
         })
         ctx.cookies.set('refreshToken', refreshToken, {
             maxAge: 30 * 24 * 60 * 60 * 1000,
             httpOnly: true,
-            secure: true,
+            // secure: true,
             path: '/api/auth/refresh',
-            sameSite: 'none'
+            // sameSite: 'none'
         })
         return {
             token,
