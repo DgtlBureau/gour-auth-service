@@ -59,9 +59,7 @@ export class AuthController {
             throw new HttpError(401, 'Bad credentials')
         }
 
-        return {
-            result: decodeToken(token),
-        };
+        return decodeToken(token);
     }
 
     @Post('/signin')
