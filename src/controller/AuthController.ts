@@ -37,11 +37,12 @@ export class AuthController {
         token: string;
         accesses: string[];
         }, @Ctx() ctx: Context) {
-        if(!verifyJwt(body.token)) {
+        const token = body.token || getToken(ctx);
+        if(!verifyJwt(token)) {
             throw new HttpError(401, 'Bad credentials')
         }
 
-        const decoded = decodeToken(body.token) as {accesses: string[]}
+        const decoded = decodeToken(token) as {accesses: string[]}
 
         return {
             result: body.accesses.some(a => decoded.accesses.includes(a))
@@ -49,13 +50,17 @@ export class AuthController {
     }
 
     @Get('/currentUser')
-    async getCurrentUser (@Body() body: { token: string; }, @Ctx() ctx: Context) {
-        if(!verifyJwt(body.token)) {
+    async getCurrentUser (
+        @Body() body: { token: string; },
+        @Ctx() ctx: Context
+    ) {
+        const token = body.token || getToken(ctx);
+        if(!verifyJwt(token)) {
             throw new HttpError(401, 'Bad credentials')
         }
 
         return {
-            result: decodeToken(body.token),
+            result: decodeToken(token),
         };
     }
 
@@ -194,4 +199,17 @@ export class AuthController {
 
         return accesses;
     }
+}
+
+function getToken(context: Context): string {
+    let accessToken = context.cookies.get('AccessToken');
+    if(!accessToken) {
+        const authorization = context.headers.authorization;
+        if(!authorization) {
+            return '';
+        }
+        accessToken = authorization.split(' ')[1];
+    }
+
+    return accessToken
 }
