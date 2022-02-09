@@ -71,6 +71,18 @@ export class AuthController {
             return this.generateTokens(user, accesses, ctx)
         }
 
+        if(!user) {
+            console.error('User is not found')
+        }
+
+        if(!user.isApproved) {
+            console.error('User is not approved')
+        }
+
+        if(!(await bcrypt.compare(credentials.password, user.password))) {
+            console.error('Bad password')
+        }
+
         throw new HttpError(401, 'Bad credentials')
     }
 
@@ -147,12 +159,14 @@ export class AuthController {
         })
         ctx.cookies.set('AccessToken', token, {
             maxAge: 4 * 60 * 60 * 1000,
-            httpOnly: true
+            httpOnly: true,
+            sameSite: 'none'
         })
         ctx.cookies.set('refreshToken', refreshToken, {
             maxAge: 30 * 24 * 60 * 60 * 1000,
             httpOnly: true,
-            path: '/api/auth/refresh'
+            path: '/api/auth/refresh',
+            sameSite: 'none'
         })
         return {
             token,
