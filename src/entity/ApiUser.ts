@@ -10,7 +10,7 @@ import {
 import {AppEntity} from "./AppEntity";
 import {ApiRole} from "./ApiRole";
 
-@Entity('api_user')
+@Entity()
 export class ApiUser extends AppEntity {
     @Column()
     login: string;

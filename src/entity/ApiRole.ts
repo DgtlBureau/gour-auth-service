@@ -10,7 +10,7 @@ import {
 import {AppEntity} from "./AppEntity";
 import {ApiAccess} from "./ApiAccess";
 
-@Entity('api_role')
+@Entity()
 export class ApiRole extends AppEntity {
     @Column()
     @Index({
