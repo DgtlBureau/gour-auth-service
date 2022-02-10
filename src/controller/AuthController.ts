@@ -63,9 +63,9 @@ export class AuthController {
     }
 
     @Post('/signin')
-    async signin (@Body() credentials: { login: string; password: string }, @Ctx() ctx: Context) {
+    async signin (@Body() credentials: { email?: string; login?: string; password: string }, @Ctx() ctx: Context) {
         const user = await this.userRepository.findOne({
-            login: credentials.login
+            login: credentials.login || credentials.email
         })
 
 
