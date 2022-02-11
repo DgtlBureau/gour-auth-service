@@ -1,0 +1,10 @@
+../node_modules
+package-lock.json
+yarn.lock
+src/**/*.js
+src/**/*.js.map
+dist
+.idea
+.env
+store.db
+store.db*

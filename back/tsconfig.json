@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+      "module": "commonjs",
+      "target": "esnext",
+      "sourceMap": true,
+      "allowJs": true,
+      "strict": false,
+      "typeRoots" : [
+        "./src/@types"
+      ],
+      "esModuleInterop": true,
+      "outDir": "../dist",
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "types": ["node"],
+      "resolveJsonModule": true
+    },
+    "files": [
+      "src/index.ts"
+    ],
+    "exclude": [
+      "../node_modules"
+    ]
+  }
