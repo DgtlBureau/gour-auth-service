@@ -9,7 +9,7 @@
         "./src/@types"
       ],
       "esModuleInterop": true,
-      "outDir": "../dist",
+      "outDir": "dist",
       "experimentalDecorators": true,
       "emitDecoratorMetadata": true,
       "types": ["node"],
@@ -19,6 +19,6 @@
       "src/index.ts"
     ],
     "exclude": [
-      "../node_modules"
+      "node_modules"
     ]
   }

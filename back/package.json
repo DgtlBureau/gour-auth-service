@@ -52,13 +52,13 @@
     "uuid": "^8.3.2"
   },
   "scripts": {
-    "build": "../node_modules/.bin/tsc",
-    "serve": "NODE_ENV=production node ../dist/index.js production",
-    "build-config": "../node_modules/.bin/ts-node src/index.ts config",
+    "build": "tsc",
+    "serve": "NODE_ENV=production node dist/index.js production",
+    "build-config": "ts-node src/index.ts config",
     "start": "nodemon src/index.ts",
     "generate-token": "ts-node generateToken.ts",
     "encryptRoleKey": "ts-node getEncryptedRole.ts",
-    "migration:generate": "../node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:generate -n",
-    "migration:migrate": "../node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:run"
+    "migration:generate": "ts-node typeorm migration:generate -n",
+    "migration:migrate": "ts-node typeorm migration:run"
   }
 }
