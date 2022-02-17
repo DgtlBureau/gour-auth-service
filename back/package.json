@@ -1,6 +1,6 @@
 {
-  "name": "bio-auth",
-  "version": "0.0.1",
+  "name": "gour-auth",
+  "version": "1.0.0",
   "description": "Auth microservice",
   "license": "MIT",
   "readmeFilename": "README.md",
