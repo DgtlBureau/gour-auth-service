@@ -48,7 +48,7 @@
     "routing-controllers-openapi": "^3.1.0",
     "sqlite3": "^5.0.2",
     "ts-node": "^10.4.0",
-    "typeorm": "^0.2.38",
+    "typeorm": "^0.2.42",
     "uuid": "^8.3.2"
   },
   "scripts": {
@@ -58,7 +58,7 @@
     "start": "nodemon src/index.ts",
     "generate-token": "ts-node generateToken.ts",
     "encryptRoleKey": "ts-node getEncryptedRole.ts",
-    "migration:generate": "ts-node typeorm migration:generate -n",
-    "migration:migrate": "ts-node typeorm migration:run"
+    "migration:generate": "ts-node --transpile-only ./node_modules/typeorm/cli.js migration:generate -n",
+    "migration:migrate": "ts-node --transpile-only ./node_modules/typeorm/cli.js migration:run"
   }
 }

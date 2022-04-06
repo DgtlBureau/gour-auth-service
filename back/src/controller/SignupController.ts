@@ -65,7 +65,11 @@ export class SignupController {
             const hashPassword = await bcrypt.hash(dto.password, 5);
             const unconfirmedRole = await this.roleRepository.findOne({
                 key: 'UNCONFIRMED_USER'
-            })
+            });
+
+            if(!unconfirmedRole) {
+                throw new HttpError(400, 'Role UNCONFIRMED_USER doest exists')
+            }
 
             const user = await this.userRepository.save({
                 ...dto,
