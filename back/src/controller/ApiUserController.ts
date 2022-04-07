@@ -6,7 +6,7 @@ import {
     Put,
     Delete,
     JsonController,
-    Authorized,
+    Authorized, Params, QueryParam, QueryParams,
 } from 'routing-controllers';
 import {getManager, Repository} from "typeorm";
 import {ApiUser} from "../entity/ApiUser";
@@ -17,7 +17,11 @@ export class ApiUserController {
     apiUserRepository: Repository<ApiUser> = getManager().getRepository(ApiUser);
 
     @Get('/apiUsers')
-    getAll() {
+    async getAll(@QueryParam('roles', {parse: true}) roles: string[] = []) {
+        if(roles.length) {
+            return (await this.apiUserRepository.find())
+                .filter(it => it.roles.some(role => roles.includes(role.key)));
+        }
         return this.apiUserRepository.find();
     }
 
