@@ -23,7 +23,7 @@ import {emailService} from "../services/emailService";
 import {ApiUser} from "../entity/ApiUser";
 import {AuthController} from "./AuthController";
 import {ApiRole} from "../entity/ApiRole";
-import { AES, enc } from 'crypto-js';
+import generatePassword from 'generate-password';
 
 @JsonController()
 export class SignupController {
@@ -108,6 +108,86 @@ export class SignupController {
             } else {
                 throw new HttpError(400, 'Login must be type of email')
             }
+    }
+
+    @Post('/signup-without-password')
+    async signupWithoutPassword (
+        @Body() dto: {
+            email: string;
+            role?: string;
+        },
+        @Ctx() ctx: Context,
+        @HeaderParam('referer') referer: string,
+    ) {
+        const candidate = await this.userRepository.findOne({
+            login: dto.email
+        })
+
+        if (candidate) {
+            throw new HttpError(
+                HttpStatus.BAD_REQUEST,
+                'email:Пользователь с таким email существует'
+            )
+        }
+
+
+        let role: ApiRole|undefined;
+        if(dto.role) {
+            const decodedRoleKey = decodeRoleKey(dto.role);
+            if(decodedRoleKey) {
+                role = await this.roleRepository.findOne({
+                    key: decodedRoleKey
+                })
+            }
+        }
+
+        const password = generatePassword.generate()
+
+        const hashPassword = await bcrypt.hash(password, 5);
+        const unconfirmedRole = await this.roleRepository.findOne({
+            key: 'UNCONFIRMED_USER'
+        });
+
+        if(!unconfirmedRole) {
+            throw new HttpError(400, 'Role UNCONFIRMED_USER doest exists')
+        }
+
+        const user = await this.userRepository.save({
+            ...dto,
+            password: hashPassword,
+            roles: [
+                unconfirmedRole
+            ]
+        })
+
+        const payload = {
+            uuid: user.uuid,
+            login: user.login,
+            referer,
+            role,
+        }
+
+        if (emailService.isEmail(user.login)) {
+            const verificationToken = encodeVerificationToken(payload);
+            await emailService.sendVerificationNoPassMessage(user.login, verificationToken, password);
+            const accesses = AuthController.getAccessFromRoles([unconfirmedRole])
+            const token = encodeJwt({
+                uuid: user.uuid,
+                login: user.login,
+                accesses,
+            })
+            ctx.cookies.set('AccessToken', token, {
+                httpOnly: true,
+            })
+
+            return {
+                result: 'Verification email was successfully sent',
+                apiUser: user,
+                token,
+            }
+        } else {
+            throw new HttpError(400, 'Login must be type of email')
+        }
     }
 
 

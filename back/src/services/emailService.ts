@@ -29,6 +29,19 @@ export const emailService = {
           }/confirmEmail?token=${token}">Подтвердить почту и войти</a>`,
       })
     },
+    sendVerificationNoPassMessage(email: string, token: string, password: string) {
+      return this.sendMail({
+          from: process.env.EMAIL_AUTH_USER,
+          to: email,
+          subject: 'Подтверждение почты Biotropica',
+          text: '',
+          html: `Ваш email был зарегистрирован в сервисе Biotropica.<br>
+Пароль для доступа в сервис: ${password}<br>
+Для подтверждения почты перейдите по ссылке: <a target="_blank" href="${
+              process.env.AUTH_SERVICE_URL
+          }/confirmEmail?token=${token}">Подтвердить почту и войти</a>`,
+      })
+    },
     sendMail(
         options: EmailOptions,
     ): Promise<SentMessageInfo> {
