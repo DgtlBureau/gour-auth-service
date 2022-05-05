@@ -153,7 +153,7 @@ export class SignupController {
         }
 
         const user = await this.userRepository.save({
-            ...dto,
+            login: dto.email,
             password: hashPassword,
             roles: [
                 unconfirmedRole
