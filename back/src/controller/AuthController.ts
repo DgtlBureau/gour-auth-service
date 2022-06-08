@@ -91,7 +91,7 @@ export class AuthController {
 
     @Post('/refresh')
     async refresh (
-        @CookieParam('refreshToken') refreshToken: string,
+        @CookieParam('RefreshToken') refreshToken: string,
         @Ctx() ctx: Context
     ) {
         const parsedRefresh = decodeToken(refreshToken) as {
