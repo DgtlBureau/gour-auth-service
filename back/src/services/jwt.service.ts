@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import { ApiUser } from '../entity/ApiUser';
 import { AES, enc } from 'crypto-js';
 
 const SECRET = process.env.ACCESS_TOKEN_SECRET;

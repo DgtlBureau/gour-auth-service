@@ -1,60 +1,52 @@
-import {getRepository, MigrationInterface, QueryRunner} from "typeorm";
-import {ApiRole} from "../entity/ApiRole";
-import {ApiAccess} from "../entity/ApiAccess";
-import {ApiUser} from "../entity/ApiUser";
-import * as bcrypt from "bcryptjs";
-import { v4 as uuidv4 } from 'uuid';
+import { getRepository, MigrationInterface, QueryRunner } from 'typeorm';
+import * as bcrypt from 'bcryptjs';
 
-export class SeedApiRole1642516368621 implements MigrationInterface {
+import { Role } from '../entity/role.entity';
+import { Access } from '../entity/access.entity';
+import { User } from '../entity/user.entity.';
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        const apiAccess = await getRepository(ApiAccess).save(
-            [
-                {
-                    key: 'API_ACCESS_CRUD',
-                    description: 'Доступ к управлению ApiAccess'
-                },
-                {
-                    key: 'API_ROLE_CRUD',
-                    description: 'Доступ к управлению ApiRole'
-                },
-                {
-                    key: 'API_USER_CRUD',
-                    description: 'Доступ к управлению ApiUser'
-                },
-            ]
-        );
+export class SeedRole1642516368621 implements MigrationInterface {
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    const accesses = await getRepository(Access).save([
+      {
+        key: 'ACCESS_CRUD',
+        description: 'Доступ к управлению Access',
+      },
+      {
+        key: 'ROLE_CRUD',
+        description: 'Доступ к управлению Role',
+      },
+      {
+        key: 'USER_CRUD',
+        description: 'Доступ к управлению User',
+      },
+    ]);
 
-        const roles = await getRepository(ApiRole).save(
-            [
-                {
-                    key: 'AUTH_API_ADMIN',
-                    accesses: apiAccess,
-                    description: 'Администратор модуля auth'
-                }
-            ]
-        );
+    const roles = await getRepository(Role).save([
+      {
+        key: 'AUTH_ADMIN',
+        description: 'Администратор модуля auth',
+        accesses,
+      },
+    ]);
 
-        await getRepository(ApiUser).save(
-            [
-                {
-                    name: 'Администратор',
-                    login: 'admin',
-                    password: await bcrypt.hash('admin', 5),
-                    roles
-                }
-            ]
-        );
-    }
+    await getRepository(User).save([
+      {
+        name: 'Администратор',
+        login: 'admin',
+        password: await bcrypt.hash('admin', 5),
+        roles,
+      },
+    ]);
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await getRepository(ApiUser).delete({login: 'admin'})
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await getRepository(User).delete({ login: 'admin' });
 
-        await getRepository(ApiRole).delete({key: 'AUTH_API_ADMIN'})
+    await getRepository(Role).delete({ key: 'AUTH_ADMIN' });
 
-        await getRepository(ApiAccess).delete({key: 'API_ACCESS_CRUD'})
-        await getRepository(ApiAccess).delete({key: 'API_ROLE_CRUD'})
-        await getRepository(ApiAccess).delete({key: 'API_USER_CRUD'})
-    }
-
+    await getRepository(Access).delete({ key: 'ACCESS_CRUD' });
+    await getRepository(Access).delete({ key: 'ROLE_CRUD' });
+    await getRepository(Access).delete({ key: 'USER_CRUD' });
+  }
 }
