@@ -1,12 +1,12 @@
 import { Param, Body, Get, Post, Put, Delete, JsonController, Authorized } from 'routing-controllers';
 import { getManager, Repository } from 'typeorm';
 
-import { Role } from '../entity/role.entity';
+import { ApiRole } from '../entity/role.entity';
 
-@Authorized('ROLE_CRUD')
+@Authorized('API_ROLE_CRUD')
 @JsonController('roles')
 export class RoleController {
-  roleRepository: Repository<Role> = getManager().getRepository(Role);
+  roleRepository: Repository<ApiRole> = getManager().getRepository(ApiRole);
 
   @Get('/')
   getAll() {
@@ -19,12 +19,12 @@ export class RoleController {
   }
 
   @Post('/')
-  post(@Body() dto: Partial<Role>) {
+  post(@Body() dto: Partial<ApiRole>) {
     return this.roleRepository.save(dto);
   }
 
   @Put('/:uuid')
-  put(@Param('uuid') uuid: string, @Body() dto: Partial<Role>) {
+  put(@Param('uuid') uuid: string, @Body() dto: Partial<ApiRole>) {
     return this.roleRepository.save({
       uuid,
       ...dto,

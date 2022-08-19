@@ -1,9 +1,9 @@
 import { Entity, Column, ManyToMany, JoinTable } from 'typeorm';
 import { Base } from './base.entity';
-import { Role } from './role.entity';
+import { ApiRole } from './role.entity';
 
 @Entity()
-export class User extends Base {
+export class ApiUser extends Base {
   @Column()
   login: string;
 
@@ -15,11 +15,11 @@ export class User extends Base {
   })
   name: string;
 
-  @ManyToMany(() => Role, {
+  @ManyToMany(() => ApiRole, {
     eager: true,
   })
   @JoinTable()
-  roles: Role[];
+  roles: ApiRole[];
 
   @Column({
     default: false,

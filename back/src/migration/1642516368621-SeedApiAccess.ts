@@ -1,28 +1,28 @@
 import { getRepository, MigrationInterface, QueryRunner } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 
-import { Role } from '../entity/role.entity';
-import { Access } from '../entity/access.entity';
-import { User } from '../entity/user.entity.';
+import { ApiRole } from '../entity/role.entity';
+import { ApiAccess } from '../entity/access.entity';
+import { ApiUser } from '../entity/user.entity.';
 
 export class SeedRole1642516368621 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const accesses = await getRepository(Access).save([
+    const accesses = await getRepository(ApiAccess).save([
       {
-        key: 'ACCESS_CRUD',
+        key: 'API_ACCESS_CRUD',
         description: 'Доступ к управлению Access',
       },
       {
-        key: 'ROLE_CRUD',
+        key: 'API_ROLE_CRUD',
         description: 'Доступ к управлению Role',
       },
       {
-        key: 'USER_CRUD',
+        key: 'API_USER_CRUD',
         description: 'Доступ к управлению User',
       },
     ]);
 
-    const roles = await getRepository(Role).save([
+    const roles = await getRepository(ApiRole).save([
       {
         key: 'AUTH_ADMIN',
         description: 'Администратор модуля auth',
@@ -30,7 +30,7 @@ export class SeedRole1642516368621 implements MigrationInterface {
       },
     ]);
 
-    await getRepository(User).save([
+    await getRepository(ApiUser).save([
       {
         name: 'Администратор',
         login: 'admin',
@@ -41,12 +41,12 @@ export class SeedRole1642516368621 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await getRepository(User).delete({ login: 'admin' });
+    await getRepository(ApiUser).delete({ login: 'admin' });
 
-    await getRepository(Role).delete({ key: 'AUTH_ADMIN' });
+    await getRepository(ApiRole).delete({ key: 'AUTH_ADMIN' });
 
-    await getRepository(Access).delete({ key: 'ACCESS_CRUD' });
-    await getRepository(Access).delete({ key: 'ROLE_CRUD' });
-    await getRepository(Access).delete({ key: 'USER_CRUD' });
+    await getRepository(ApiAccess).delete({ key: 'API_ACCESS_CRUD' });
+    await getRepository(ApiAccess).delete({ key: 'API_ROLE_CRUD' });
+    await getRepository(ApiAccess).delete({ key: 'API_USER_CRUD' });
   }
 }

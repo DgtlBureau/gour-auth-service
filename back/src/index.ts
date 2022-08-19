@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { createConnection } from 'typeorm';
 import { Action, createKoaServer, getMetadataArgsStorage } from 'routing-controllers';
 import { routingControllersToSpec } from 'routing-controllers-openapi';
+import { Context } from 'koa';
 import bodyParser from 'koa-bodyparser';
 import { config } from 'dotenv';
 import cors from '@koa/cors';
@@ -58,6 +59,9 @@ createConnection().then(async () => {
 
   app
     .use(bodyParser())
+    .use((ctx: Context) => {
+      ctx.body = ctx.request.body;
+    })
     .use(
       cors({
         credentials: true,
@@ -67,8 +71,4 @@ createConnection().then(async () => {
     .listen(PORT, () => {
       console.log(`Server was started at ${PORT}`);
     });
-
-  app.use((req: Request) => {
-    console.log(req);
-  });
 });

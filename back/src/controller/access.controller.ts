@@ -1,12 +1,12 @@
 import { Param, Body, Get, Post, Put, Delete, JsonController, Authorized } from 'routing-controllers';
 import { getManager, Repository } from 'typeorm';
 
-import { Access } from '../entity/access.entity';
+import { ApiAccess } from '../entity/access.entity';
 
-@Authorized('ACCESS_CRUD')
+@Authorized('API_ACCESS_CRUD')
 @JsonController('access')
 export class AccessController {
-  accessRepository: Repository<Access> = getManager().getRepository(Access);
+  accessRepository: Repository<ApiAccess> = getManager().getRepository(ApiAccess);
 
   @Get('/')
   getAll() {
@@ -19,12 +19,12 @@ export class AccessController {
   }
 
   @Post('/')
-  post(@Body() dto: Partial<Access>) {
+  post(@Body() dto: Partial<ApiAccess>) {
     return this.accessRepository.save(dto);
   }
 
   @Put('/:uuid')
-  put(@Param('uuid') uuid: string, @Body() dto: Partial<Access>) {
+  put(@Param('uuid') uuid: string, @Body() dto: Partial<ApiAccess>) {
     return this.accessRepository.update(uuid, dto);
   }
 

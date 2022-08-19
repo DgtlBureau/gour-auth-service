@@ -5,12 +5,12 @@ import { Context } from 'koa';
 
 import { decodeToken, encodeJwt, encodeRefresh, verifyJwt, verifyRefresh } from '../services/jwt.service';
 import { HttpStatus } from '../constants/http-status';
-import { User } from '../entity/user.entity.';
-import { Role } from '../entity/role.entity';
+import { ApiUser } from '../entity/user.entity.';
+import { ApiRole } from '../entity/role.entity';
 
 @JsonController('auth')
 export class AuthController {
-  userRepository: Repository<User> = getManager().getRepository(User);
+  userRepository: Repository<ApiUser> = getManager().getRepository(ApiUser);
 
   @Post('/check-token')
   async checkToken(@Body() dto: { token: string }, @Ctx() ctx: Context) {
@@ -110,7 +110,7 @@ export class AuthController {
 
   @Patch('/change-password')
   async changePassword(
-    @CurrentUser() user: User,
+    @CurrentUser() user: ApiUser,
     @Body()
     dto: {
       currentPassword: string;
@@ -138,7 +138,7 @@ export class AuthController {
     return this.generateTokens(updatedUser, accesses, ctx);
   }
 
-  generateTokens(user: Partial<User>, accesses: string[], ctx: Context) {
+  generateTokens(user: Partial<ApiUser>, accesses: string[], ctx: Context) {
     const token = encodeJwt({
       uuid: user.uuid,
       login: user.login,
@@ -173,7 +173,7 @@ export class AuthController {
     }
   }
 
-  static getAccessFromRoles(roles: Role[]) {
+  static getAccessFromRoles(roles: ApiRole[]) {
     // TODO: Сделать возможность расширяемости
     const accesses: string[] = [];
     for (const role of roles) {

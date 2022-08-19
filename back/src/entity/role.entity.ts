@@ -1,9 +1,9 @@
 import { Entity, Column, ManyToMany, JoinTable, Index } from 'typeorm';
 import { Base } from './base.entity';
-import { Access } from './access.entity';
+import { ApiAccess } from './access.entity';
 
 @Entity()
-export class Role extends Base {
+export class ApiRole extends Base {
   @Column()
   @Index({
     unique: true,
@@ -15,14 +15,14 @@ export class Role extends Base {
   })
   description: string;
 
-  @ManyToMany(() => Access, {
+  @ManyToMany(() => ApiAccess, {
     eager: true,
     cascade: true,
   })
   @JoinTable()
-  accesses: Access[];
+  accesses: ApiAccess[];
 
-  @ManyToMany(() => Role)
+  @ManyToMany(() => ApiRole)
   @JoinTable()
-  extends: Role[];
+  extends: ApiRole[];
 }

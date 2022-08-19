@@ -13,14 +13,14 @@ import {
 } from '../services/jwt.service';
 import { HttpStatus } from '../constants/http-status';
 import { emailService } from '../services/email.service';
-import { User } from '../entity/user.entity.';
 import { AuthController } from './auth.controller';
-import { Role } from '../entity/role.entity';
+import { ApiUser } from '../entity/user.entity.';
+import { ApiRole } from '../entity/role.entity';
 
 @JsonController('auth')
 export class SignupController {
-  userRepository: Repository<User> = getManager().getRepository(User);
-  roleRepository: Repository<Role> = getManager().getRepository(Role);
+  userRepository: Repository<ApiUser> = getManager().getRepository(ApiUser);
+  roleRepository: Repository<ApiRole> = getManager().getRepository(ApiRole);
 
   @Post('/signup')
   async signup(
@@ -41,7 +41,7 @@ export class SignupController {
       throw new HttpError(HttpStatus.BAD_REQUEST, 'login:Пользователь с таким login существует');
     }
 
-    let role: Role | undefined;
+    let role: ApiRole | undefined;
     if (dto.role) {
       const decodedRoleKey = decodeRoleKey(dto.role);
       if (decodedRoleKey) {
@@ -115,7 +115,7 @@ export class SignupController {
       throw new HttpError(HttpStatus.BAD_REQUEST, 'email:Пользователь с таким email существует');
     }
 
-    let role: Role | undefined;
+    let role: ApiRole | undefined;
     if (dto.role) {
       const decodedRoleKey = decodeRoleKey(dto.role);
       if (decodedRoleKey) {
@@ -180,9 +180,9 @@ export class SignupController {
     const parsed = decodeToken(token) as {
       uuid: string;
       referer: string;
-      role?: Role;
+      role?: ApiRole;
     };
-    const updatedRole: Partial<User> = {
+    const updatedRole: Partial<ApiUser> = {
       uuid: parsed.uuid,
       isApproved: true,
     };
