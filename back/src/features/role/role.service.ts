@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -23,7 +19,7 @@ export class RoleService {
 
     try {
       return await this.roleRepository.save({ key, description });
-    } catch {
+    } catch (e) {
       throw new BadRequestException('Роль с таким ключем уже существует');
     }
   }
@@ -41,20 +37,20 @@ export class RoleService {
   }
 
   async update(uuid: string, dto: UpdateRoleDto) {
-    try {
-      const fields = formatFields<UpdateRoleDto>(['key', 'description'], dto);
+    const fields = formatFields<UpdateRoleDto>(['key', 'description'], dto);
 
-      return await this.roleRepository.update(uuid, fields);
-    } catch {
-      throw new NotFoundException('Роль не найдена');
+    const { affected: updatedRows } = await this.roleRepository.update(uuid, fields);
+
+    if (!updatedRows) {
+      throw new NotFoundException('Роль не найден');
     }
   }
 
   async remove(uuid: string) {
-    const { affected: deletedColumns } = await this.roleRepository.delete(uuid);
+    const { affected: deletedRows } = await this.roleRepository.delete(uuid);
 
-    if (!deletedColumns) {
-      throw new BadRequestException(`Роль с id ${uuid} не существует`);
+    if (!deletedRows) {
+      throw new BadRequestException('Роль не существует');
     }
   }
 }

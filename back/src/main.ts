@@ -3,13 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 
-const requiredEnvs = [
-  'DB_HOST',
-  'DB_PORT',
-  'DB_USERNAME',
-  'DB_PASSWORD',
-  'DB_DATABASE',
-];
+const requiredEnvs = ['DB_HOST', 'DB_PORT', 'DB_USERNAME', 'DB_PASSWORD', 'DB_DATABASE'];
 
 requiredEnvs.forEach((key) => {
   if (!process.env[key]) {
@@ -18,20 +12,15 @@ requiredEnvs.forEach((key) => {
 });
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  // const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-  //   AppModule,
-  //   {
-  //     transport: Transport.TCP,
-  //     options: {
-  //       port: +process.env.PORT,
-  //     },
-  //   },
-  // );
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
+    transport: Transport.TCP,
+    options: {
+      port: +process.env.PORT,
+    },
+  });
 
   app.useGlobalPipes(new ValidationPipe());
 
-  await app.listen(+process.env.PORT);
   console.log('APP LISTEN %s port', process.env.PORT);
 }
 

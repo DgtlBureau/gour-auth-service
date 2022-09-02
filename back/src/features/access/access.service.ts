@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -41,21 +37,19 @@ export class AccessService {
   }
 
   async update(uuid: string, dto: UpdateAccessDto) {
-    try {
-      const fields = formatFields<UpdateAccessDto>(['key', 'description'], dto);
+    const fields = formatFields<UpdateAccessDto>(['key', 'description'], dto);
 
-      return await this.accessRepository.update(uuid, fields);
-    } catch {
+    const { affected: updatedRows } = await this.accessRepository.update(uuid, fields);
+
+    if (!updatedRows) {
       throw new NotFoundException('Доступ не найден');
     }
   }
 
   async remove(uuid: string) {
-    const { affected: deletedColumns } = await this.accessRepository.delete(
-      uuid,
-    );
+    const { affected: deletedRows } = await this.accessRepository.delete(uuid);
 
-    if (!deletedColumns) {
+    if (!deletedRows) {
       throw new BadRequestException(`Доступ с id ${uuid} не существует`);
     }
   }
