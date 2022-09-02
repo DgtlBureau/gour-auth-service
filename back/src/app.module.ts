@@ -6,9 +6,9 @@ import { ApiAccess } from './entity/ApiAccess';
 import { ApiRole } from './entity/ApiRole';
 import { ApiUser } from './entity/ApiUser';
 import { SignUpModule } from './features/sign-up/sign-up.module';
-import { UserModule } from './features/user/user.module'
+import { UserModule } from './features/user/user.module';
 import { AccessModule } from './features/access/access.module';
-import { RoleModule } from './features/role/role.module'
+import { RoleModule } from './features/role/role.module';
 
 @Module({
   imports: [

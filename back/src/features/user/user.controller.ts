@@ -1,17 +1,7 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 
 import { ApiRole } from 'src/entity/ApiRole';
-import { ApiUser } from 'src/entity/ApiUser';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
@@ -28,7 +18,7 @@ export class UserController {
 
   @Get(':uuid')
   @MessagePattern('get-user-by-id')
-  getUserByUuid(@Param() id: string) {
+  getUserByUuid(@Param('uuid') id: string) {
     return this.userService.getOneByUuid(id);
   }
 
@@ -40,13 +30,13 @@ export class UserController {
 
   @Put('/:uuid')
   @MessagePattern('update-user')
-  updateOne(@Param() uuid: string, @Body() userDto: UpdateUserDto) {
+  updateOne(@Param('uuid') uuid: string, @Body() userDto: UpdateUserDto) {
     return this.userService.updateOne(uuid, userDto);
   }
 
   @Delete('/:uuid')
   @MessagePattern('delete-user')
-  delete(@Param() uuid: string) {
+  delete(@Param('uuid') uuid: string) {
     return this.userService.deleteOne(uuid);
   }
 }
