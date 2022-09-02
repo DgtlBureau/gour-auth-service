@@ -15,12 +15,14 @@ async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
     transport: Transport.TCP,
     options: {
+      host: 'localhost',
       port: +process.env.PORT,
     },
   });
 
   app.useGlobalPipes(new ValidationPipe());
 
+  await app.listen();
   console.log('APP LISTEN %s port', process.env.PORT);
 }
 
