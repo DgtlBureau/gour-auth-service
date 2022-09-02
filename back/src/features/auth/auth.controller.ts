@@ -1,65 +1,34 @@
-import { BadRequestException, Controller, Req, Res } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { Request, Response } from 'express';
 import generatePassword from 'generate-password';
 
 import { AuthService } from './auth.service';
-import { CookieService } from './cookie.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterWithoutPasswordUserDto } from './dto/register-user-without-password.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 
-@Controller()
+@Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService, private readonly cookieService: CookieService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @MessagePattern('signup')
-  async register(@Payload() userDto: RegisterWithoutPasswordUserDto, @Res() res: Response) {
+  register(@Payload() userDto: RegisterWithoutPasswordUserDto) {
     const password = generatePassword.generate();
-    const { user, accessToken, refreshToken } = await this.authService.register({ ...userDto, password });
-
-    this.cookieService.setAccessToken(res, accessToken);
-    this.cookieService.setRefreshToken(res, refreshToken);
-
-    return user;
+    return this.authService.register({ ...userDto, password });
   }
 
   @MessagePattern('signup-without-password')
-  async registerWithoutPassword(@Payload() userDto: RegisterUserDto, @Res() res: Response) {
-    const { user, accessToken, refreshToken } = await this.authService.register(userDto);
-
-    this.cookieService.setAccessToken(res, accessToken);
-    this.cookieService.setRefreshToken(res, refreshToken);
-
-    return user;
+  registerWithoutPassword(@Payload() userDto: RegisterUserDto) {
+    return this.authService.register(userDto);
   }
 
   @MessagePattern('signin')
-  async login(@Payload() userDto: LoginUserDto, @Res() res: Response) {
-    const { user, accessToken, refreshToken } = await this.authService.login(userDto);
-
-    this.cookieService.setAccessToken(res, accessToken);
-    this.cookieService.setRefreshToken(res, refreshToken);
-
-    return user;
-  }
-
-  @MessagePattern('sign-out')
-  signOut(@Res() res: Response) {
-    this.cookieService.clearAllTokens(res);
+  login(@Payload() userDto: LoginUserDto) {
+    return this.authService.login(userDto);
   }
 
   @MessagePattern('refresh')
-  async refresh(@Req() req: Request, @Res() res: Response) {
-    const oldRefreshToken = req.cookies[this.cookieService.ACCESS_TOKEN_NAME];
-
-    if (!oldRefreshToken) {
-      throw new BadRequestException('Нет токена для авторизации');
-    }
-
-    const { accessToken, refreshToken } = this.authService.refresh(oldRefreshToken);
-
-    this.cookieService.setAccessToken(res, accessToken);
-    this.cookieService.setRefreshToken(res, refreshToken);
+  refresh(@Payload() oldRefreshToken: string) {
+    return this.authService.refresh(oldRefreshToken);
   }
 }

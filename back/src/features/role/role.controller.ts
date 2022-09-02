@@ -1,34 +1,35 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller('apiRoles')
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
-  @Get()
+  @MessagePattern('get-roles')
   findAll() {
     return this.roleService.findAll();
   }
 
-  @Get(':uuid')
-  findOne(@Param('uuid') uuid: string) {
+  @MessagePattern('find-role')
+  findOne(@Payload('uuid') uuid: string) {
     return this.roleService.findOne(uuid);
   }
 
-  @Post()
-  create(@Body() dto: CreateRoleDto) {
+  @MessagePattern('create-role')
+  create(@Payload() dto: CreateRoleDto) {
     return this.roleService.create(dto);
   }
 
-  @Put(':uuid')
-  update(@Param('uuid') uuid: string, @Body() dto: UpdateRoleDto) {
+  @MessagePattern('update-role')
+  update(@Payload('uuid') uuid: string, @Payload('dto') dto: UpdateRoleDto) {
     return this.roleService.update(uuid, dto);
   }
 
-  @Delete(':uuid')
-  remove(@Param('uuid') uuid: string) {
+  @MessagePattern('delete-role')
+  remove(@Payload('uuid') uuid: string) {
     return this.roleService.remove(uuid);
   }
 }

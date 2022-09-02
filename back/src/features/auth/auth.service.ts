@@ -4,7 +4,6 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UserService } from '../user/user.service';
 import { ApiUser } from 'src/entity/ApiUser';
-import { CookieService } from './cookie.service';
 import { decodeToken, encodeJwt, encodeRefreshJwt } from './jwt.service';
 import { Payload } from '@nestjs/microservices';
 
@@ -53,7 +52,7 @@ export class AuthService {
     if (!user) throw new UnauthorizedException();
 
     const payload = {
-      id: user.id,
+      id: user.id, // FIXME: стандартизировать юзера для jwt
     };
 
     const accessToken = encodeJwt(payload);

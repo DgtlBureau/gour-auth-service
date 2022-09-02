@@ -5,10 +5,10 @@ import { ConfigModule } from '@nestjs/config';
 import { ApiAccess } from './entity/ApiAccess';
 import { ApiRole } from './entity/ApiRole';
 import { ApiUser } from './entity/ApiUser';
-import { SignUpModule } from './features/sign-up/sign-up.module';
 import { UserModule } from './features/user/user.module';
 import { AccessModule } from './features/access/access.module';
 import { RoleModule } from './features/role/role.module';
+import { AuthModule } from './features/auth/auth.module';
 
 @Module({
   imports: [
@@ -33,11 +33,10 @@ import { RoleModule } from './features/role/role.module';
         subscribersDir: 'src/subscriber',
       },
     }),
-    SignUpModule,
+    AuthModule,
     UserModule,
     AccessModule,
     RoleModule,
-    // AuthModule,
   ],
 })
 export class AppModule {}

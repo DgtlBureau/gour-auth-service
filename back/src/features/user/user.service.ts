@@ -55,7 +55,8 @@ export class UserService {
   }
 
   async updateOne(uuid: string, userDto: UpdateUserDto) {
-    const fields = formatFields<UpdateUserDto>(['login', 'name', 'password'], userDto);
+    const fields = formatFields<Partial<UpdateUserDto>>(['login', 'name', 'password', 'roles'], userDto);
+    fields.password &&= await this.hashPassword(fields.password);
 
     const { affected: updatedRows } = await this.userRepository.update(uuid, fields);
 
@@ -72,11 +73,11 @@ export class UserService {
     }
   }
 
-  hashPassword(pass: string) {
-    return bcrypt.hash(pass, SALT);
-  }
-
   async comparePasswords(pass: string, encrypted: string) {
     return bcrypt.compare(pass, encrypted);
+  }
+
+  private hashPassword(pass: string) {
+    return bcrypt.hash(pass, SALT);
   }
 }

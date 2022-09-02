@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AccessService } from './access.service';
 import { CreateAccessDto } from './dto/create-access.dto';
 import { UpdateAccessDto } from './dto/update-access.dto';
@@ -7,28 +8,28 @@ import { UpdateAccessDto } from './dto/update-access.dto';
 export class AccessController {
   constructor(private readonly accessService: AccessService) {}
 
-  @Get()
+  @MessagePattern('get-all-access')
   findAll() {
     return this.accessService.findAll();
   }
 
-  @Get(':uuid')
-  findOne(@Param('uuid') uuid: string) {
+  @MessagePattern('get-all-access')
+  findOne(@Payload('uuid') uuid: string) {
     return this.accessService.findOne(uuid);
   }
 
-  @Post()
-  create(@Body() dto: CreateAccessDto) {
+  @MessagePattern('create-access')
+  create(@Payload() dto: CreateAccessDto) {
     return this.accessService.create(dto);
   }
 
-  @Put(':uuid')
-  update(@Param('uuid') uuid: string, @Body() dto: UpdateAccessDto) {
+  @MessagePattern('update-access')
+  update(@Payload('uuid') uuid: string, @Payload('dto') dto: UpdateAccessDto) {
     return this.accessService.update(uuid, dto);
   }
 
-  @Delete(':uuid')
-  remove(@Param('uuid') uuid: string) {
+  @MessagePattern('delete-access')
+  remove(@Payload('uuid') uuid: string) {
     return this.accessService.remove(uuid);
   }
 }

@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
-import { MessagePattern } from '@nestjs/microservices';
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
 import { ApiRole } from 'src/entity/ApiRole';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -10,33 +10,29 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get()
   @MessagePattern('get-users-by-roles')
-  getAllByRoles(@Query('roles') roles: ApiRole[] = []) {
+  @MessagePattern('get-users-by-roles')
+  getAllByRoles(@Payload() roles: ApiRole[] = []) {
     return this.userService.getAllByRoles(roles);
   }
 
-  @Get(':uuid')
   @MessagePattern('get-user-by-id')
-  getUserByUuid(@Param('uuid') id: string) {
+  getUserByUuid(@Payload('uuid') id: string) {
     return this.userService.getOneByUuid(id);
   }
 
-  @Post()
   @MessagePattern('create-user')
-  create(@Body() dto: CreateUserDto) {
+  create(@Payload() dto: CreateUserDto) {
     return this.userService.create(dto);
   }
 
-  @Put('/:uuid')
   @MessagePattern('update-user')
-  updateOne(@Param('uuid') uuid: string, @Body() userDto: UpdateUserDto) {
+  updateOne(@Payload('uuid') uuid: string, @Payload('dto') userDto: UpdateUserDto) {
     return this.userService.updateOne(uuid, userDto);
   }
 
-  @Delete('/:uuid')
   @MessagePattern('delete-user')
-  delete(@Param('uuid') uuid: string) {
+  delete(@Payload('uuid') uuid: string) {
     return this.userService.deleteOne(uuid);
   }
 }

@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsArray, IsEmail, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { ApiUser } from 'src/entity/ApiUser';
 
 export class UpdateUserDto {
@@ -22,5 +22,10 @@ export class UpdateUserDto {
   @IsOptional()
   @MinLength(5)
   @MaxLength(30)
-  readonly password: ApiUser['password'];
+  password: ApiUser['password'];
+
+  @ApiPropertyOptional()
+  @IsArray()
+  @IsOptional()
+  roles: number[];
 }
