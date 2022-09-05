@@ -8,6 +8,7 @@ import { ApiRole } from 'src/entity/ApiRole';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { formatFields } from 'src/utils/formatFields';
+import { RoleService } from '../role/role.service';
 
 const SALT = 5;
 
@@ -16,6 +17,7 @@ export class UserService {
   constructor(
     @InjectRepository(ApiUser)
     private userRepository: Repository<ApiUser>,
+    private roleService: RoleService,
   ) {}
 
   async getAllByRoles(roles: ApiRole[]) {
@@ -42,20 +44,40 @@ export class UserService {
   }
 
   async create(dto: CreateUserDto) {
-    const { login, name, password } = dto;
+    const { login, name, password, isApproved = false, roleIds } = dto;
 
     const hashedPassword = await this.hashPassword(password);
+    const roles = [];
+    if (roleIds?.length) {
+      for (const roleId of roleIds) {
+        roles.push(await this.roleService.findOne(roleId));
+      }
+    }
 
     const { password: _, ...user } = await this.userRepository.save({
       login,
       name,
       password: hashedPassword,
+      isApproved,
+      roles,
     });
     return user;
   }
 
-  async updateOne(uuid: string, userDto: UpdateUserDto) {
-    const fields = formatFields<Partial<UpdateUserDto>>(['login', 'name', 'password', 'roles'], userDto);
+  async updateOne(uuid: string, { roleIds, ...userDto }: UpdateUserDto) {
+    const fieldsForUpdate: Partial<ApiUser> = { ...userDto };
+
+    if (roleIds) {
+      fieldsForUpdate.roles = [];
+      for (const roleId of roleIds) {
+        fieldsForUpdate.roles.push(await this.roleService.findOne(roleId));
+      }
+    }
+
+    const fields = formatFields<Partial<ApiUser>>(
+      ['login', 'name', 'password', 'roles', 'isApproved'],
+      fieldsForUpdate,
+    );
     fields.password &&= await this.hashPassword(fields.password);
 
     const { affected: updatedRows } = await this.userRepository.update(uuid, fields);
@@ -73,7 +95,7 @@ export class UserService {
     }
   }
 
-  async comparePasswords(pass: string, encrypted: string) {
+  comparePasswords(pass: string, encrypted: string) {
     return bcrypt.compare(pass, encrypted);
   }
 

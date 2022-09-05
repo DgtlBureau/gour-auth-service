@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Payload } from '@nestjs/microservices';
 
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UserService } from '../user/user.service';
 import { ApiUser } from 'src/entity/ApiUser';
 import { decodeToken, encodeJwt, encodeRefreshJwt } from './jwt.service';
-import { Payload } from '@nestjs/microservices';
 
 @Injectable()
 export class AuthService {

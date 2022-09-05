@@ -27,5 +27,5 @@ export class UpdateUserDto {
   @ApiPropertyOptional()
   @IsArray()
   @IsOptional()
-  roles: number[];
+  readonly roleIds: string[];
 }

@@ -4,7 +4,7 @@ import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 import { ApiUser } from 'src/entity/ApiUser';
 
 export class RegisterWithoutPasswordUserDto {
-  @ApiProperty()
+  @ApiProperty({ example: 'alex@gmail.com' })
   @IsEmail()
   @MinLength(3)
   @MaxLength(30)

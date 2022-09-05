@@ -2,6 +2,7 @@ import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import generatePassword from 'generate-password';
 
+import { verifyAccessJwt } from './jwt.service';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterWithoutPasswordUserDto } from './dto/register-user-without-password.dto';
@@ -30,5 +31,17 @@ export class AuthController {
   @MessagePattern('refresh')
   refresh(@Payload() oldRefreshToken: string) {
     return this.authService.refresh(oldRefreshToken);
+  }
+
+  // TODO: /checkAccess
+
+  // @MessagePattern('change-password')
+  // changePassword() {}
+
+  @MessagePattern('check-token')
+  checkToken(token: string) {
+    return {
+      result: verifyAccessJwt(token),
+    };
   }
 }

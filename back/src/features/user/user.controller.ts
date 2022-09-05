@@ -11,7 +11,6 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @MessagePattern('get-users-by-roles')
-  @MessagePattern('get-users-by-roles')
   getAllByRoles(@Payload() roles: ApiRole[] = []) {
     return this.userService.getAllByRoles(roles);
   }
