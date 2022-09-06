@@ -8,6 +8,13 @@ export type Role = {
     accesses: ApiAccess[];
 }
 
+type RoleDto = {
+    uuid: Role['uuid'];
+    key: Role['key'];
+    description: Role['description'];
+    accessIds: string[];
+}
+
 export const roleApi = {
     async getAll(): Promise<Role[]> {
         const {data: roles} = await axios.get('/role')
@@ -20,7 +27,13 @@ export const roleApi = {
         return role;
     },
     async update(role: Partial<Role> & {uuid: string}): Promise<Role> {
-        const {data: result} = await axios.put('/role/' + role.uuid, role)
+        const { accesses, ...dto } = role;
+        const body: Partial<RoleDto> = dto;
+
+        if (role.accesses) {
+            body.accessIds = role.accesses.map(i => i.uuid);
+        }
+        const {data: result} = await axios.put('/role/' + role.uuid, body);
 
         return result;
     },

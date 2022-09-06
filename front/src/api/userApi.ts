@@ -7,8 +7,16 @@ export type User = {
     login: string;
     password: string;
     name: string;
-    roles: Role[]
+    roles: Role[];
 }
+
+type UserDto = {
+    uuid: string;
+    login: string;
+    password: string;
+    name: string;
+    roleIds: string[];
+};
 
 export const userApi = {
     async getAll(): Promise<User[]> {
@@ -22,7 +30,13 @@ export const userApi = {
         return user;
     },
     async update(user: Partial<User> & {uuid: string}): Promise<User> {
-        const {data: result} = await axios.put('/user/' + user.uuid, user)
+        const { roles, login, ...dto } = user;
+        const body: Partial<UserDto> = dto;
+
+        if (user.roles) {
+            body.roleIds = user.roles.map(i => i.uuid);
+        }
+        const {data: result} = await axios.put('/user/' + user.uuid, body);
 
         return result;
     },
