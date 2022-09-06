@@ -27,7 +27,7 @@ export function UserList() {
     }
 
     async function deleteUser(userUuid: string) {
-        if(window.confirm('Уверены, что хотите удалить роль?')) {
+        if(window.confirm('Уверены, что хотите удалить пользователя?')) {
             await userApi.remove(userUuid);
             setUsers(users.filter(it => it.uuid !== userUuid));
         }
