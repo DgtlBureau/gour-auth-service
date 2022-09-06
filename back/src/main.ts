@@ -1,9 +1,18 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { AppModule } from './app.module';
+import * as Sentry from '@sentry/node';
 
-const requiredEnvs = ['DB_HOST', 'DB_PORT', 'DB_USERNAME', 'DB_PASSWORD', 'DB_DATABASE'];
+import { AppModule } from './app.module';
+import { getRequiredEnvsByNodeEnv } from './common/utils/getRequiredEnvsByNodeEnv';
+import { NodeEnv } from './common/types/App';
+
+const envs = ['DB_HOST', 'DB_PORT', 'DB_USERNAME', 'DB_PASSWORD', 'DB_DATABASE'];
+
+const requiredEnvs = getRequiredEnvsByNodeEnv(
+  { common: envs, development: ['SENTRY_DSN'], production: ['SENTRY_DSN'] },
+  process.env.NODE_ENV as NodeEnv,
+);
 
 requiredEnvs.forEach((key) => {
   if (!process.env[key]) {
@@ -22,8 +31,16 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
+  if (['production', 'development'].includes(process.env.NODE_ENV)) {
+    Sentry.init({
+      dsn: process.env.SENTRY_DSN,
+      environment: process.env.NODE_ENV,
+      tracesSampleRate: 1.0,
+    });
+  }
+
   await app.listen();
-  console.log('APP LISTEN %s port', process.env.PORT);
+  console.log('AUTH SERVICE LISTEN: ', process.env.PORT);
 }
 
 bootstrap();
