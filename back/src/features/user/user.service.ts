@@ -73,7 +73,7 @@ export class UserService {
     if (roleIds) {
       fields.roles ??= [];
       for (const roleId of roleIds) {
-        fields.roles.push(await this.roleService.findOne(roleId)); // TODO: fix relations
+        fields.roles.push(await this.roleService.findOne(roleId));
       }
     }
     fields.password &&= await this.hashPassword(fields.password);

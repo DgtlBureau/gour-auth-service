@@ -17,10 +17,18 @@ export class RoleService {
   ) {}
 
   async create(dto: CreateRoleDto) {
-    const { key, description } = dto;
+    const fields: DeepPartial<ApiRole> = formatFields<CreateRoleDto>(['key', 'description'], dto);
+
+    if (dto.accessIds) {
+      fields.accesses = [];
+
+      for (const accessId of dto.accessIds) {
+        fields.accesses.push(await this.accessService.findOne(accessId));
+      }
+    }
 
     try {
-      return await this.roleRepository.save({ key, description });
+      return await this.roleRepository.save(fields);
     } catch (e) {
       throw new BadRequestException('Роль с таким ключем уже существует');
     }
