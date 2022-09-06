@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 
 import { ApiRole } from 'src/entity/ApiRole';
 import { formatFields } from 'src/utils/formatFields';
+import { AccessService } from '../access/access.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 
@@ -12,6 +13,7 @@ export class RoleService {
   constructor(
     @InjectRepository(ApiRole)
     private roleRepository: Repository<ApiRole>,
+    private readonly accessService: AccessService,
   ) {}
 
   async create(dto: CreateRoleDto) {
@@ -37,13 +39,23 @@ export class RoleService {
   }
 
   async update(uuid: string, dto: UpdateRoleDto) {
-    const fields = formatFields<UpdateRoleDto>(['key', 'description'], dto);
+    const candidate = await this.roleRepository.findOne(uuid);
 
-    const { affected: updatedRows } = await this.roleRepository.update(uuid, fields);
-
-    if (!updatedRows) {
-      throw new NotFoundException('Роль не найден');
+    if (!candidate) {
+      throw new NotFoundException('Роль не найдена');
     }
+
+    const fields: DeepPartial<ApiRole> = formatFields<UpdateRoleDto>(['key', 'description'], dto);
+
+    if (dto.accessIds) {
+      fields.accesses ??= [];
+
+      for (const accessId of dto.accessIds) {
+        fields.accesses.push(await this.accessService.findOne(accessId));
+      }
+    }
+
+    return await this.roleRepository.save({ uuid, ...fields });
   }
 
   async remove(uuid: string) {
@@ -52,5 +64,6 @@ export class RoleService {
     if (!deletedRows) {
       throw new BadRequestException('Роль не существует');
     }
+    return {};
   }
 }

@@ -13,7 +13,7 @@ export class RoleController {
     return this.roleService.findAll();
   }
 
-  @MessagePattern('find-role')
+  @MessagePattern('get-role')
   findOne(@Payload('uuid') uuid: string) {
     return this.roleService.findOne(uuid);
   }

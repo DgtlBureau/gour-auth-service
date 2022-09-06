@@ -9,5 +9,6 @@ import { AccessService } from './access.service';
   imports: [TypeOrmModule.forFeature([ApiAccess])],
   controllers: [AccessController],
   providers: [AccessService],
+  exports: [AccessService],
 })
 export class AccessModule {}

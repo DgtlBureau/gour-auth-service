@@ -13,7 +13,7 @@ export class AccessController {
     return this.accessService.findAll();
   }
 
-  @MessagePattern('get-all-access')
+  @MessagePattern('get-one-access')
   findOne(@Payload('uuid') uuid: string) {
     return this.accessService.findOne(uuid);
   }

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
 
 import { ApiAccess } from './entity/ApiAccess';
 import { ApiRole } from './entity/ApiRole';
@@ -9,6 +10,7 @@ import { UserModule } from './features/user/user.module';
 import { AccessModule } from './features/access/access.module';
 import { RoleModule } from './features/role/role.module';
 import { AuthModule } from './features/auth/auth.module';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 @Module({
   imports: [
@@ -37,6 +39,12 @@ import { AuthModule } from './features/auth/auth.module';
     UserModule,
     AccessModule,
     RoleModule,
+  ],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
   ],
 })
 export class AppModule {}

@@ -37,13 +37,15 @@ export class AccessService {
   }
 
   async update(uuid: string, dto: UpdateAccessDto) {
-    const fields = formatFields<UpdateAccessDto>(['key', 'description'], dto);
+    const candidate = await this.accessRepository.findOne(uuid);
 
-    const { affected: updatedRows } = await this.accessRepository.update(uuid, fields);
-
-    if (!updatedRows) {
+    if (!candidate) {
       throw new NotFoundException('Доступ не найден');
     }
+
+    const fields = formatFields<UpdateAccessDto>(['key', 'description'], dto);
+
+    return await this.accessRepository.save({ uuid, ...fields });
   }
 
   async remove(uuid: string) {
@@ -52,5 +54,6 @@ export class AccessService {
     if (!deletedRows) {
       throw new BadRequestException(`Доступ с id ${uuid} не существует`);
     }
+    return {};
   }
 }
