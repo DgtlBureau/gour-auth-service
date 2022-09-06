@@ -8,26 +8,26 @@ export type ApiAccess= {
 
 export const accessApi = {
     async getAll(): Promise<ApiAccess[]> {
-        const {data: accesss} = await axios.get('/apiAccess')
+        const {data: accesss} = await axios.get('/access')
 
         return accesss;
     },
     async getOne(uuid: string): Promise<ApiAccess> {
-        const {data: access} = await axios.get('/apiAccess/' + uuid)
+        const {data: access} = await axios.get('/access/' + uuid)
 
         return access;
     },
     async update(access: Partial<ApiAccess> & {uuid: string}): Promise<ApiAccess> {
-        const {data: result} = await axios.put('/apiAccess/' + access.uuid, access)
+        const {data: result} = await axios.put('/access/' + access.uuid, access)
 
         return result;
     },
     async create(access: Partial<ApiAccess>): Promise<ApiAccess> {
-        const {data: result} = await axios.post('/apiAccess', access)
+        const {data: result} = await axios.post('/access', access)
 
         return result;
     },
     async remove(accessUuid: string) {
-        await axios.delete('/apiAccess/' + accessUuid)
+        await axios.delete('/access/' + accessUuid)
     }
 }

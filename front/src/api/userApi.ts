@@ -12,26 +12,26 @@ export type User = {
 
 export const userApi = {
     async getAll(): Promise<User[]> {
-        const {data: users} = await axios.get('/apiUsers')
+        const {data: users} = await axios.get('/user')
 
         return users;
     },
     async getOne(uuid: string): Promise<User> {
-        const {data: user} = await axios.get('/apiUsers/' + uuid)
+        const {data: user} = await axios.get('/user/' + uuid)
 
         return user;
     },
     async update(user: Partial<User> & {uuid: string}): Promise<User> {
-        const {data: result} = await axios.put('/apiUsers/' + user.uuid, user)
+        const {data: result} = await axios.put('/user/' + user.uuid, user)
 
         return result;
     },
     async create(user: Partial<User>): Promise<User> {
-        const {data: result} = await axios.post('/apiUsers', user)
+        const {data: result} = await axios.post('/user', user)
 
         return result;
     },
     async remove(userUuid: string) {
-        await axios.delete('/apiUsers/' + userUuid)
+        await axios.delete('/user/' + userUuid)
     }
 }

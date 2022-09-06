@@ -10,15 +10,10 @@ const emptyAccess: Partial<ApiAccess> = {
 
 export function AccessList() {
     const [accesss, setAccesss] = useState<ApiAccess[]>([]);
-    const history = useHistory();
 
     useEffect(() => {
         accessApi.getAll().then(setAccesss)
     }, [])
-
-    function goToAccess(accessUuid: string) {
-        history.push('/accesss/' + accessUuid);
-    }
 
     async function createAccess(access: Partial<ApiAccess>) {
         const savedAccess = await accessApi.create(access);
@@ -26,7 +21,7 @@ export function AccessList() {
     }
 
     async function deleteAccess(accessUuid: string) {
-        if(window.confirm('Уверены, что хотите удалить роль?')) {
+        if(window.confirm('Уверены, что хотите удалить доступ?')) {
             await accessApi.remove(accessUuid);
             setAccesss(accesss.filter(it => it.uuid !== accessUuid));
         }
@@ -46,7 +41,6 @@ export function AccessList() {
             <tbody>
                 {accesss.map(access => <AccessRow
                     access={access}
-                    onClick={() => goToAccess(access.uuid)}
                     onDelete={() => deleteAccess(access.uuid)}
                 />)}
             <EditableRow
@@ -60,16 +54,12 @@ export function AccessList() {
 
 function AccessRow(props: {
     access: ApiAccess;
-    onClick(): void;
     onDelete(): void;
                  }) {
     return <tr>
         <td>{props.access.key}</td>
         <td>{props.access.description}</td>
         <td>
-            <Button onClick={props.onClick}>
-            Перейти
-            </Button>
             <Button onClick={props.onDelete} variant="danger">
                 Удалить
             </Button>
