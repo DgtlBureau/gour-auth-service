@@ -30,9 +30,9 @@ export class UserService {
       .map(({ password: _, ...user }) => user);
   }
 
-  async getOneByUuid(uuid: string) {
+  async getOneById(id: number) {
     try {
-      const { password: _, ...user } = await this.userRepository.findOneOrFail(uuid);
+      const { password: _, ...user } = await this.userRepository.findOneOrFail(id);
       return user;
     } catch {
       throw new NotFoundException('Пользователь не найден');
@@ -58,8 +58,8 @@ export class UserService {
     return user;
   }
 
-  async updateOne(uuid: string, { roleIds, ...userDto }: UpdateUserDto) {
-    const candidate = await this.userRepository.findOne(uuid);
+  async updateOne(id: number, { roleIds, ...userDto }: UpdateUserDto) {
+    const candidate = await this.userRepository.findOne(id);
 
     if (!candidate) {
       throw new NotFoundException('Пользователь не найден');
@@ -78,12 +78,12 @@ export class UserService {
     }
     fields.password &&= await this.hashPassword(fields.password);
 
-    const { password: _, ...user } = await this.userRepository.save({ uuid, ...fields });
+    const { password: _, ...user } = await this.userRepository.save({ id, ...fields });
     return user;
   }
 
-  async deleteOne(uuid: string) {
-    const { affected: deletedRows } = await this.userRepository.delete(uuid);
+  async deleteOne(id: number) {
+    const { affected: deletedRows } = await this.userRepository.delete(id);
 
     if (!deletedRows) {
       throw new BadRequestException(`Пользователь не существует`);

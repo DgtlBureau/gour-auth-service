@@ -31,7 +31,7 @@ export class ApiRole extends AppEntity {
   @JoinTable()
   accesses: ApiAccess[];
 
-  @ManyToMany(() => ApiRole)
-  @JoinTable()
-  extends: ApiRole[];
+  // @ManyToMany(() => ApiRole)
+  // @JoinTable()
+  // extends: ApiRole[];
 }

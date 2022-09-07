@@ -20,5 +20,5 @@ export class UpdateRoleDto {
   @ApiPropertyOptional()
   @IsArray()
   @IsOptional()
-  accessIds?: string[];
+  accessIds?: number[];
 }

@@ -18,5 +18,5 @@ export class CreateRoleDto {
   @ApiPropertyOptional()
   @IsArray()
   @IsOptional()
-  accessIds?: string[];
+  accessIds?: number[];
 }

@@ -28,16 +28,16 @@ export class AccessService {
     return this.accessRepository.find();
   }
 
-  async findOne(uuid: string) {
+  async findOne(id: number) {
     try {
-      return await this.accessRepository.findOneOrFail(uuid);
+      return await this.accessRepository.findOneOrFail(id);
     } catch {
       throw new NotFoundException('Доступ не найден');
     }
   }
 
-  async update(uuid: string, dto: UpdateAccessDto) {
-    const candidate = await this.accessRepository.findOne(uuid);
+  async update(id: number, dto: UpdateAccessDto) {
+    const candidate = await this.accessRepository.findOne(id);
 
     if (!candidate) {
       throw new NotFoundException('Доступ не найден');
@@ -45,14 +45,14 @@ export class AccessService {
 
     const fields = formatFields<UpdateAccessDto>(['key', 'description'], dto);
 
-    return await this.accessRepository.save({ uuid, ...fields });
+    return this.accessRepository.save({ id, ...fields });
   }
 
-  async remove(uuid: string) {
-    const { affected: deletedRows } = await this.accessRepository.delete(uuid);
+  async remove(id: number) {
+    const { affected: deletedRows } = await this.accessRepository.delete(id);
 
     if (!deletedRows) {
-      throw new BadRequestException(`Доступ с id ${uuid} не существует`);
+      throw new BadRequestException(`Доступ с id ${id} не существует`);
     }
     return {};
   }

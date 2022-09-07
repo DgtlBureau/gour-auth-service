@@ -16,8 +16,8 @@ export function RoleList() {
         roleApi.getAll().then(setRoles)
     }, [])
 
-    function goToRole(roleUuid: string) {
-        history.push('/roles/' + roleUuid);
+    function goToRole(roleId: number) {
+        history.push('/roles/' + roleId);
     }
 
     async function createRole(role: Partial<Role>) {
@@ -25,10 +25,10 @@ export function RoleList() {
         setRoles([...roles, savedRole]);
     }
 
-    async function deleteRole(roleUuid: string) {
+    async function deleteRole(roleId: number) {
         if(window.confirm('Уверены, что хотите удалить роль?')) {
-            await roleApi.remove(roleUuid);
-            setRoles(roles.filter(it => it.uuid !== roleUuid));
+            await roleApi.remove(roleId);
+            setRoles(roles.filter(it => it.id !== roleId));
         }
     }
 
@@ -46,8 +46,8 @@ export function RoleList() {
             <tbody>
                 {roles.map(role => <RoleRow
                     role={role}
-                    onClick={() => goToRole(role.uuid)}
-                    onDelete={() => deleteRole(role.uuid)}
+                    onClick={() => goToRole(role.id)}
+                    onDelete={() => deleteRole(role.id)}
                 />)}
             <EditableRow
                 role={emptyRole}

@@ -13,9 +13,9 @@ import {Button, Container, Nav, Navbar} from "react-bootstrap";
 import {authApi} from "./api/authApi";
 
 const routes = {
-  '/roles/:uuid': RoleItem,
+  '/roles/:id': RoleItem,
   '/roles': RoleList,
-  '/users/:uuid': UserItem,
+  '/users/:id': UserItem,
   '/users': UserList,
   '/access': AccessList,
   '/signin': SignIn,

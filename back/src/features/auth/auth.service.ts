@@ -63,7 +63,7 @@ export class AuthService {
 
   private signTokens(user: Omit<ApiUser, 'password'>) {
     const payload = {
-      uuid: user.uuid,
+      id: user.id,
       role: user.roles,
     };
 

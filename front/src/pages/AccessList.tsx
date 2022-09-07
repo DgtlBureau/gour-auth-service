@@ -1,7 +1,6 @@
 import {Button, Form, Table} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import {ApiAccess, accessApi} from "../api/accessApi";
-import {useHistory, useLocation} from "react-router-dom";
 
 const emptyAccess: Partial<ApiAccess> = {
     key: '',
@@ -20,10 +19,10 @@ export function AccessList() {
         setAccesss([...accesss, savedAccess]);
     }
 
-    async function deleteAccess(accessUuid: string) {
+    async function deleteAccess(accessId: number) {
         if(window.confirm('Уверены, что хотите удалить доступ?')) {
-            await accessApi.remove(accessUuid);
-            setAccesss(accesss.filter(it => it.uuid !== accessUuid));
+            await accessApi.remove(accessId);
+            setAccesss(accesss.filter((it) => it.id !== accessId));
         }
     }
 
@@ -41,7 +40,7 @@ export function AccessList() {
             <tbody>
                 {accesss.map(access => <AccessRow
                     access={access}
-                    onDelete={() => deleteAccess(access.uuid)}
+                    onDelete={() => deleteAccess(access.id)}
                 />)}
             <EditableRow
                 access={emptyAccess}

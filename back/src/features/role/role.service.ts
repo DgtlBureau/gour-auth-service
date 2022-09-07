@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
 
@@ -38,16 +38,16 @@ export class RoleService {
     return this.roleRepository.find();
   }
 
-  async findOne(uuid: string) {
+  async findOne(id: number) {
     try {
-      return await this.roleRepository.findOneOrFail(uuid);
+      return await this.roleRepository.findOneOrFail(id);
     } catch {
       throw new NotFoundException('Роль не найдена');
     }
   }
 
-  async update(uuid: string, dto: UpdateRoleDto) {
-    const candidate = await this.roleRepository.findOne(uuid);
+  async update(id: number, dto: UpdateRoleDto) {
+    const candidate = await this.roleRepository.findOne(id);
 
     if (!candidate) {
       throw new NotFoundException('Роль не найдена');
@@ -63,11 +63,11 @@ export class RoleService {
       }
     }
 
-    return await this.roleRepository.save({ uuid, ...fields });
+    return this.roleRepository.save({ id, ...fields });
   }
 
-  async remove(uuid: string) {
-    const { affected: deletedRows } = await this.roleRepository.delete(uuid);
+  async remove(id: number) {
+    const { affected: deletedRows } = await this.roleRepository.delete(id);
 
     if (!deletedRows) {
       throw new BadRequestException('Роль не существует');

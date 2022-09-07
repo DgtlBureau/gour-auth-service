@@ -5,11 +5,11 @@ import {accessApi, ApiAccess} from "../api/accessApi";
 import {Form, Table} from "react-bootstrap";
 
 export function RoleItem() {
-    const {uuid} = useParams<{ uuid: string }>();
+    const {id} = useParams<{ id: string }>();
     const [role, setRole] = useState<Role | null>(null);
     const [accesses, setAccesses] = useState<ApiAccess[]>([]);
     useEffect(() => {
-        roleApi.getOne(uuid).then(setRole)
+        roleApi.getOne(+id).then(setRole)
         accessApi.getAll().then(setAccesses)
     }, [])
     if (!role) {
@@ -24,7 +24,7 @@ export function RoleItem() {
         const updatedRole = {
             ...role,
             accesses: [
-                ...role.accesses.filter(it => it.uuid !== access.uuid),
+                ...role.accesses.filter(it => it.id !== access.id),
                 access
             ]
         }
@@ -40,7 +40,7 @@ export function RoleItem() {
 
         const updatedRole = {
             ...role,
-            accesses: role.accesses.filter(it => it.uuid !== access.uuid)
+            accesses: role.accesses.filter(it => it.id !== access.id)
         }
         roleApi.update(updatedRole);
         setRole(updatedRole)
@@ -53,7 +53,7 @@ export function RoleItem() {
             <tbody>
             {accesses.map(access => <AccessRow
                 access={access}
-                selected={role.accesses.some(it => it.uuid === access.uuid)}
+                selected={role.accesses.some(it => it.id === access.id)}
                 onChange={val => val ? selectAccess(access) : unselectAccess(access)}
             />)}
             </tbody>

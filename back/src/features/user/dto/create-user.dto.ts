@@ -29,5 +29,5 @@ export class CreateUserDto {
   @ApiPropertyOptional()
   @IsArray()
   @IsOptional()
-  readonly roleIds?: string[];
+  readonly roleIds?: number[];
 }

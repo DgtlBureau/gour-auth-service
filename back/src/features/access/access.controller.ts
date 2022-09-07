@@ -14,8 +14,8 @@ export class AccessController {
   }
 
   @MessagePattern('get-one-access')
-  findOne(@Payload('uuid') uuid: string) {
-    return this.accessService.findOne(uuid);
+  findOne(@Payload('uuid') id: number) {
+    return this.accessService.findOne(id);
   }
 
   @MessagePattern('create-access')
@@ -24,12 +24,12 @@ export class AccessController {
   }
 
   @MessagePattern('update-access')
-  update(@Payload('uuid') uuid: string, @Payload('dto') dto: UpdateAccessDto) {
-    return this.accessService.update(uuid, dto);
+  update(@Payload('uuid') id: number, @Payload('dto') dto: UpdateAccessDto) {
+    return this.accessService.update(id, dto);
   }
 
   @MessagePattern('delete-access')
-  remove(@Payload('uuid') uuid: string) {
-    return this.accessService.remove(uuid);
+  remove(@Payload('uuid') id: number) {
+    return this.accessService.remove(id);
   }
 }

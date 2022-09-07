@@ -3,10 +3,10 @@ import { ApiRole } from '../entity/ApiRole';
 import { ApiAccess } from '../entity/ApiAccess';
 import { ApiUser } from '../entity/ApiUser';
 import * as bcrypt from 'bcryptjs';
-import { v4 as uuidv4 } from 'uuid';
 
 export class SeedApiRole1642516368621 implements MigrationInterface {
-  public async up(queryRunner: QueryRunner): Promise<void> {
+  public async up(_queryRunner: QueryRunner): Promise<void> {
+    return;
     const apiAccess = await getRepository(ApiAccess).save([
       {
         key: 'API_ACCESS_CRUD',
@@ -33,14 +33,14 @@ export class SeedApiRole1642516368621 implements MigrationInterface {
     await getRepository(ApiUser).save([
       {
         name: 'Администратор',
-        login: 'admin',
+        login: 'admin@admin.com',
         password: await bcrypt.hash('admin', 5),
         roles,
       },
     ]);
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {
+  public async down(_queryRunner: QueryRunner): Promise<void> {
     await getRepository(ApiUser).delete({ login: 'admin' });
 
     await getRepository(ApiRole).delete({ key: 'AUTH_API_ADMIN' });
