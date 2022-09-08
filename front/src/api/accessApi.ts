@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export type ApiAccess= {
-    uuid: string;
+    id: number;
     key: string;
     description: string;
 }
@@ -12,13 +12,13 @@ export const accessApi = {
 
         return accesss;
     },
-    async getOne(uuid: string): Promise<ApiAccess> {
-        const {data: access} = await axios.get('/access/' + uuid)
+    async getOne(id: number): Promise<ApiAccess> {
+        const {data: access} = await axios.get('/access/' + id)
 
         return access;
     },
-    async update(access: Partial<ApiAccess> & {uuid: string}): Promise<ApiAccess> {
-        const {data: result} = await axios.put('/access/' + access.uuid, access)
+    async update(access: Partial<ApiAccess> & {id: number}): Promise<ApiAccess> {
+        const {data: result} = await axios.put('/access/' + access.id, access)
 
         return result;
     },
@@ -27,7 +27,7 @@ export const accessApi = {
 
         return result;
     },
-    async remove(accessUuid: string) {
-        await axios.delete('/access/' + accessUuid)
+    async remove(accessId: number) {
+        await axios.delete('/access/' + accessId)
     }
 }

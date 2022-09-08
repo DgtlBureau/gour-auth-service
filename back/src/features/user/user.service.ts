@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
-import { ApiUser } from 'src/entity/ApiUser';
-import { ApiRole } from 'src/entity/ApiRole';
+import { User } from 'src/entity/User';
+import { Role } from 'src/entity/Role';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { formatFields } from 'src/utils/formatFields';
@@ -15,12 +15,12 @@ const SALT = 5;
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(ApiUser)
-    private userRepository: Repository<ApiUser>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
     private roleService: RoleService,
   ) {}
 
-  async getAllByRoles(roles: ApiRole[]) {
+  async getAllByRoles(roles: Role[]) {
     const users = await this.userRepository.find();
 
     if (!roles.length) return users;
@@ -30,9 +30,9 @@ export class UserService {
       .map(({ password: _, ...user }) => user);
   }
 
-  async getOneByUuid(uuid: string) {
+  async getOneById(id: number) {
     try {
-      const { password: _, ...user } = await this.userRepository.findOneOrFail(uuid);
+      const { password: _, ...user } = await this.userRepository.findOneOrFail(id);
       return user;
     } catch {
       throw new NotFoundException('Пользователь не найден');
@@ -44,7 +44,7 @@ export class UserService {
   }
 
   async create(dto: CreateUserDto) {
-    const fields: DeepPartial<ApiUser> = formatFields<Partial<ApiUser>>(['login', 'name', 'isApproved'], dto);
+    const fields: DeepPartial<User> = formatFields<Partial<User>>(['login', 'name', 'isApproved'], dto);
 
     fields.password = await this.hashPassword(dto.password);
 
@@ -58,17 +58,14 @@ export class UserService {
     return user;
   }
 
-  async updateOne(uuid: string, { roleIds, ...userDto }: UpdateUserDto) {
-    const candidate = await this.userRepository.findOne(uuid);
+  async updateOne(id: number, { roleIds, ...userDto }: UpdateUserDto) {
+    const candidate = await this.userRepository.findOne(id);
 
     if (!candidate) {
       throw new NotFoundException('Пользователь не найден');
     }
 
-    const fields: DeepPartial<ApiUser> = formatFields<Partial<ApiUser>>(
-      ['login', 'name', 'password', 'isApproved'],
-      userDto,
-    );
+    const fields: DeepPartial<User> = formatFields<Partial<User>>(['login', 'name', 'password', 'isApproved'], userDto);
 
     if (roleIds) {
       fields.roles ??= [];
@@ -78,12 +75,12 @@ export class UserService {
     }
     fields.password &&= await this.hashPassword(fields.password);
 
-    const { password: _, ...user } = await this.userRepository.save({ uuid, ...fields });
+    const { password: _, ...user } = await this.userRepository.save({ id, ...fields });
     return user;
   }
 
-  async deleteOne(uuid: string) {
-    const { affected: deletedRows } = await this.userRepository.delete(uuid);
+  async deleteOne(id: number) {
+    const { affected: deletedRows } = await this.userRepository.delete(id);
 
     if (!deletedRows) {
       throw new BadRequestException(`Пользователь не существует`);

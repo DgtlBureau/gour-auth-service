@@ -4,7 +4,7 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 
-@Controller('apiRoles')
+@Controller('roles')
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
@@ -14,8 +14,8 @@ export class RoleController {
   }
 
   @MessagePattern('get-role')
-  findOne(@Payload('uuid') uuid: string) {
-    return this.roleService.findOne(uuid);
+  findOne(@Payload('uuid') id: number) {
+    return this.roleService.findOne(id);
   }
 
   @MessagePattern('create-role')
@@ -24,12 +24,12 @@ export class RoleController {
   }
 
   @MessagePattern('update-role')
-  update(@Payload('uuid') uuid: string, @Payload('dto') dto: UpdateRoleDto) {
-    return this.roleService.update(uuid, dto);
+  update(@Payload('uuid') id: number, @Payload('dto') dto: UpdateRoleDto) {
+    return this.roleService.update(id, dto);
   }
 
   @MessagePattern('delete-role')
-  remove(@Payload('uuid') uuid: string) {
-    return this.roleService.remove(uuid);
+  remove(@Payload('uuid') id: number) {
+    return this.roleService.remove(id);
   }
 }

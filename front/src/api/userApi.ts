@@ -1,9 +1,8 @@
 import axios from "axios";
-import {ApiAccess} from "./accessApi";
 import {Role} from "./roleApi";
 
 export type User = {
-    uuid: string
+    id: number
     login: string;
     password: string;
     name: string;
@@ -11,11 +10,11 @@ export type User = {
 }
 
 type UserDto = {
-    uuid: string;
+    id: number;
     login: string;
     password: string;
     name: string;
-    roleIds: string[];
+    roleIds: number[];
 };
 
 export const userApi = {
@@ -24,19 +23,19 @@ export const userApi = {
 
         return users;
     },
-    async getOne(uuid: string): Promise<User> {
-        const {data: user} = await axios.get('/user/' + uuid)
+    async getOne(id: number): Promise<User> {
+        const {data: user} = await axios.get('/user/' + id)
 
         return user;
     },
-    async update(user: Partial<User> & {uuid: string}): Promise<User> {
+    async update(user: Partial<User> & {id: number}): Promise<User> {
         const { roles, login, ...dto } = user;
         const body: Partial<UserDto> = dto;
 
         if (user.roles) {
-            body.roleIds = user.roles.map(i => i.uuid);
+            body.roleIds = user.roles.map(i => i.id);
         }
-        const {data: result} = await axios.put('/user/' + user.uuid, body);
+        const {data: result} = await axios.put('/user/' + user.id, body);
 
         return result;
     },
@@ -45,7 +44,7 @@ export const userApi = {
 
         return result;
     },
-    async remove(userUuid: string) {
-        await axios.delete('/user/' + userUuid)
+    async remove(userId: number) {
+        await axios.delete('/user/' + userId)
     }
 }

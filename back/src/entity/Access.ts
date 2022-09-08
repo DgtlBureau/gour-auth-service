@@ -1,8 +1,8 @@
 import { Entity, Column, Index } from 'typeorm';
-import { AppEntity } from './AppEntity';
+import { AppEntity } from './Entity';
 
 @Entity()
-export class ApiAccess extends AppEntity {
+export class Access extends AppEntity {
   @Index({
     unique: true,
   })

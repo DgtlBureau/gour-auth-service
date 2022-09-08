@@ -1,8 +1,8 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
 
-import { ApiRole } from 'src/entity/ApiRole';
+import { Role } from 'src/entity/Role';
 import { formatFields } from 'src/utils/formatFields';
 import { AccessService } from '../access/access.service';
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -11,13 +11,13 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 @Injectable()
 export class RoleService {
   constructor(
-    @InjectRepository(ApiRole)
-    private roleRepository: Repository<ApiRole>,
+    @InjectRepository(Role)
+    private roleRepository: Repository<Role>,
     private readonly accessService: AccessService,
   ) {}
 
   async create(dto: CreateRoleDto) {
-    const fields: DeepPartial<ApiRole> = formatFields<CreateRoleDto>(['key', 'description'], dto);
+    const fields: DeepPartial<Role> = formatFields<CreateRoleDto>(['key', 'description'], dto);
 
     if (dto.accessIds) {
       fields.accesses = [];
@@ -38,22 +38,22 @@ export class RoleService {
     return this.roleRepository.find();
   }
 
-  async findOne(uuid: string) {
+  async findOne(id: number) {
     try {
-      return await this.roleRepository.findOneOrFail(uuid);
+      return await this.roleRepository.findOneOrFail(id);
     } catch {
       throw new NotFoundException('Роль не найдена');
     }
   }
 
-  async update(uuid: string, dto: UpdateRoleDto) {
-    const candidate = await this.roleRepository.findOne(uuid);
+  async update(id: number, dto: UpdateRoleDto) {
+    const candidate = await this.roleRepository.findOne(id);
 
     if (!candidate) {
       throw new NotFoundException('Роль не найдена');
     }
 
-    const fields: DeepPartial<ApiRole> = formatFields<UpdateRoleDto>(['key', 'description'], dto);
+    const fields: DeepPartial<Role> = formatFields<UpdateRoleDto>(['key', 'description'], dto);
 
     if (dto.accessIds) {
       fields.accesses ??= [];
@@ -63,11 +63,11 @@ export class RoleService {
       }
     }
 
-    return await this.roleRepository.save({ uuid, ...fields });
+    return this.roleRepository.save({ id, ...fields });
   }
 
-  async remove(uuid: string) {
-    const { affected: deletedRows } = await this.roleRepository.delete(uuid);
+  async remove(id: number) {
+    const { affected: deletedRows } = await this.roleRepository.delete(id);
 
     if (!deletedRows) {
       throw new BadRequestException('Роль не существует');

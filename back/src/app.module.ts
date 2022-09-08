@@ -3,9 +3,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 
-import { ApiAccess } from './entity/ApiAccess';
-import { ApiRole } from './entity/ApiRole';
-import { ApiUser } from './entity/ApiUser';
+import { Access } from './entity/Access';
+import { Role } from './entity/Role';
+import { User } from './entity/User';
 import { UserModule } from './features/user/user.module';
 import { AccessModule } from './features/access/access.module';
 import { RoleModule } from './features/role/role.module';
@@ -27,7 +27,7 @@ import { SentryInterceptor } from './common/interceptors/sentry.interceptor';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       synchronize: false,
-      entities: [ApiAccess, ApiRole, ApiUser],
+      entities: [Access, Role, User],
       subscribers: ['dist/subscriber/*.js'],
       migrations: ['dist/migration/*.js'],
       cli: {
