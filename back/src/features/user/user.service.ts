@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
-import { ApiUser } from 'src/entity/ApiUser';
-import { ApiRole } from 'src/entity/ApiRole';
+import { User } from 'src/entity/User';
+import { Role } from 'src/entity/Role';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { formatFields } from 'src/utils/formatFields';
@@ -15,12 +15,12 @@ const SALT = 5;
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(ApiUser)
-    private userRepository: Repository<ApiUser>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
     private roleService: RoleService,
   ) {}
 
-  async getAllByRoles(roles: ApiRole[]) {
+  async getAllByRoles(roles: Role[]) {
     const users = await this.userRepository.find();
 
     if (!roles.length) return users;
@@ -44,7 +44,7 @@ export class UserService {
   }
 
   async create(dto: CreateUserDto) {
-    const fields: DeepPartial<ApiUser> = formatFields<Partial<ApiUser>>(['login', 'name', 'isApproved'], dto);
+    const fields: DeepPartial<User> = formatFields<Partial<User>>(['login', 'name', 'isApproved'], dto);
 
     fields.password = await this.hashPassword(dto.password);
 
@@ -65,10 +65,7 @@ export class UserService {
       throw new NotFoundException('Пользователь не найден');
     }
 
-    const fields: DeepPartial<ApiUser> = formatFields<Partial<ApiUser>>(
-      ['login', 'name', 'password', 'isApproved'],
-      userDto,
-    );
+    const fields: DeepPartial<User> = formatFields<Partial<User>>(['login', 'name', 'password', 'isApproved'], userDto);
 
     if (roleIds) {
       fields.roles ??= [];

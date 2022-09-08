@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { ApiAccess } from 'src/entity/ApiAccess';
+import { Access } from 'src/entity/Access';
 import { formatFields } from 'src/utils/formatFields';
 import { CreateAccessDto } from './dto/create-access.dto';
 import { UpdateAccessDto } from './dto/update-access.dto';
@@ -10,8 +10,8 @@ import { UpdateAccessDto } from './dto/update-access.dto';
 @Injectable()
 export class AccessService {
   constructor(
-    @InjectRepository(ApiAccess)
-    private accessRepository: Repository<ApiAccess>,
+    @InjectRepository(Access)
+    private accessRepository: Repository<Access>,
   ) {}
 
   async create(dto: CreateAccessDto) {

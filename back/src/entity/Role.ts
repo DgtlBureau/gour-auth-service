@@ -8,11 +8,11 @@ import {
   JoinTable,
   Index,
 } from 'typeorm';
-import { AppEntity } from './AppEntity';
-import { ApiAccess } from './ApiAccess';
+import { AppEntity } from './Entity';
+import { Access } from './Access';
 
 @Entity()
-export class ApiRole extends AppEntity {
+export class Role extends AppEntity {
   @Column()
   @Index({
     unique: true,
@@ -24,14 +24,14 @@ export class ApiRole extends AppEntity {
   })
   description: string;
 
-  @ManyToMany(() => ApiAccess, {
+  @ManyToMany(() => Access, {
     eager: true,
     cascade: true,
   })
   @JoinTable()
-  accesses: ApiAccess[];
+  accesses: Access[];
 
-  // @ManyToMany(() => ApiRole)
+  // @ManyToMany(() => Role)
   // @JoinTable()
-  // extends: ApiRole[];
+  // extends: Role[];
 }

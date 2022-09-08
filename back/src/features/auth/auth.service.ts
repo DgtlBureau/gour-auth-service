@@ -4,7 +4,7 @@ import { Payload } from '@nestjs/microservices';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UserService } from '../user/user.service';
-import { ApiUser } from 'src/entity/ApiUser';
+import { User } from 'src/entity/User';
 import { decodeToken, encodeJwt, encodeRefreshJwt } from './jwt.service';
 
 @Injectable()
@@ -61,7 +61,7 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  private signTokens(user: Omit<ApiUser, 'password'>) {
+  private signTokens(user: Omit<User, 'password'>) {
     const payload = {
       id: user.id,
       role: user.roles,

@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
 
-import { ApiRole } from 'src/entity/ApiRole';
+import { Role } from 'src/entity/Role';
 import { formatFields } from 'src/utils/formatFields';
 import { AccessService } from '../access/access.service';
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -11,13 +11,13 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 @Injectable()
 export class RoleService {
   constructor(
-    @InjectRepository(ApiRole)
-    private roleRepository: Repository<ApiRole>,
+    @InjectRepository(Role)
+    private roleRepository: Repository<Role>,
     private readonly accessService: AccessService,
   ) {}
 
   async create(dto: CreateRoleDto) {
-    const fields: DeepPartial<ApiRole> = formatFields<CreateRoleDto>(['key', 'description'], dto);
+    const fields: DeepPartial<Role> = formatFields<CreateRoleDto>(['key', 'description'], dto);
 
     if (dto.accessIds) {
       fields.accesses = [];
@@ -53,7 +53,7 @@ export class RoleService {
       throw new NotFoundException('Роль не найдена');
     }
 
-    const fields: DeepPartial<ApiRole> = formatFields<UpdateRoleDto>(['key', 'description'], dto);
+    const fields: DeepPartial<Role> = formatFields<UpdateRoleDto>(['key', 'description'], dto);
 
     if (dto.accessIds) {
       fields.accesses ??= [];

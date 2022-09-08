@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { ApiRole } from 'src/entity/ApiRole';
+import { Role } from 'src/entity/Role';
 import { AccessModule } from '../access/access.module';
 import { RoleController } from './role.controller';
 import { RoleService } from './role.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ApiRole]), AccessModule],
+  imports: [TypeOrmModule.forFeature([Role]), AccessModule],
   controllers: [RoleController],
   providers: [RoleService],
   exports: [RoleService],

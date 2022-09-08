@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { ApiAccess } from 'src/entity/ApiAccess';
+import { Access } from 'src/entity/Access';
 import { AccessController } from './access.controller';
 import { AccessService } from './access.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ApiAccess])],
+  imports: [TypeOrmModule.forFeature([Access])],
   controllers: [AccessController],
   providers: [AccessService],
   exports: [AccessService],
