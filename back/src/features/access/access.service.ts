@@ -39,9 +39,7 @@ export class AccessService {
   async update(id: number, dto: UpdateAccessDto) {
     const candidate = await this.accessRepository.findOne(id);
 
-    if (!candidate) {
-      throw new NotFoundException('Доступ не найден');
-    }
+    if (!candidate) throw new NotFoundException('Доступ не найден');
 
     const fields = formatFields<UpdateAccessDto>(['key', 'description'], dto);
 
@@ -51,9 +49,8 @@ export class AccessService {
   async remove(id: number) {
     const { affected: deletedRows } = await this.accessRepository.delete(id);
 
-    if (!deletedRows) {
-      throw new BadRequestException(`Доступ с id ${id} не существует`);
-    }
-    return {};
+    if (!deletedRows) throw new BadRequestException(`Доступ с id ${id} не существует`);
+
+    return deletedRows;
   }
 }

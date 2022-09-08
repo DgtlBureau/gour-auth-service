@@ -8,21 +8,21 @@ export class UpdateUserDto {
   @IsOptional()
   @MinLength(3)
   @MaxLength(30)
-  readonly login?: ApiUser['login'];
+  readonly login?: User['login'];
 
   @ApiPropertyOptional({ example: 'alex_track' })
   @IsString()
   @IsOptional()
   @MinLength(3)
   @MaxLength(30)
-  readonly name?: ApiUser['name'];
+  readonly name?: User['name'];
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   @MinLength(5)
   @MaxLength(30)
-  readonly password?: ApiUser['password'];
+  readonly password?: User['password'];
 
   @ApiPropertyOptional()
   @IsArray()

@@ -8,7 +8,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterWithoutPasswordUserDto } from './dto/register-user-without-password.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { ApiUser } from 'src/entity/ApiUser';
+import { User } from 'src/entity/User';
 
 @Controller('auth')
 export class AuthController {
@@ -22,6 +22,7 @@ export class AuthController {
   @MessagePattern('signup')
   register(@Payload() dto: RegisterWithoutPasswordUserDto) {
     const password = generatePassword.generate();
+
     return this.authService.register({ ...dto, password });
   }
 
@@ -43,14 +44,14 @@ export class AuthController {
   // TODO: /checkAccess
 
   @MessagePattern('change-password')
-  changePassword(@Payload('user') user: ApiUser, @Payload('dto') dto: ChangePasswordDto) {
+  changePassword(@Payload('user') user: User, @Payload('dto') dto: ChangePasswordDto) {
     return this.authService.changePassword(user.id, dto);
   }
 
   @MessagePattern('check-token')
   checkToken(@Payload() token: string) {
     return {
-      result: verifyAccessJwt(token),
+      result: verifyAccessJwt(token, process.env.ACCESS_TOKEN_SECRET),
     };
   }
 }

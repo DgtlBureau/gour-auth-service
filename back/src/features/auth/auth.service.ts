@@ -51,8 +51,8 @@ export class AuthService {
       id: user.id, // FIXME: стандартизировать юзера для jwt
     };
 
-    const accessToken = encodeJwt(payload);
-    const refreshToken = encodeRefreshJwt(payload);
+    const accessToken = encodeJwt(payload, process.env.ACCESS_TOKEN_SECRET);
+    const refreshToken = encodeRefreshJwt(payload, process.env.REFRESH_TOKEN_SECRET);
 
     return { accessToken, refreshToken };
   }
@@ -63,8 +63,8 @@ export class AuthService {
       role: user.roles,
     };
 
-    const accessToken = encodeJwt(payload);
-    const refreshToken = encodeRefreshJwt(payload);
+    const accessToken = encodeJwt(payload, process.env.ACCESS_TOKEN_SECRET);
+    const refreshToken = encodeRefreshJwt(payload, process.env.REFRESH_TOKEN_SECRET);
 
     return { accessToken, refreshToken };
   }
@@ -84,8 +84,6 @@ export class AuthService {
   }
 
   async getCurrentUser(userId: number) {
-    const { password: _, ...user } = await this.userService.getOneById(userId);
-
-    return user;
+    return this.userService.getOneById(userId);
   }
 }

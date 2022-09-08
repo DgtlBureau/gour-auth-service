@@ -23,12 +23,14 @@ export class RoleService {
       fields.accesses = [];
 
       for (const accessId of dto.accessIds) {
-        fields.accesses.push(await this.accessService.findOne(accessId));
+        const access = await this.accessService.findOne(accessId);
+
+        fields.accesses.push(access);
       }
     }
 
     try {
-      return await this.roleRepository.save(fields);
+      return this.roleRepository.save(fields);
     } catch (e) {
       throw new BadRequestException('Роль с таким ключом уже существует');
     }
@@ -40,18 +42,16 @@ export class RoleService {
 
   async findOne(id: number) {
     try {
-      return await this.roleRepository.findOneOrFail(id);
+      return this.roleRepository.findOneOrFail(id);
     } catch {
       throw new NotFoundException('Роль не найдена');
     }
   }
 
   async update(id: number, dto: UpdateRoleDto) {
-    const candidate = await this.roleRepository.findOne(id);
+    const role = await this.roleRepository.findOne(id);
 
-    if (!candidate) {
-      throw new NotFoundException('Роль не найдена');
-    }
+    if (!role) throw new NotFoundException('Роль не найдена');
 
     const fields: DeepPartial<Role> = formatFields<UpdateRoleDto>(['key', 'description'], dto);
 
@@ -59,11 +59,13 @@ export class RoleService {
       fields.accesses ??= [];
 
       for (const accessId of dto.accessIds) {
-        fields.accesses.push(await this.accessService.findOne(accessId));
+        const access = await this.accessService.findOne(accessId);
+
+        fields.accesses.push(access);
       }
     }
 
-    return await this.roleRepository.save({ id, ...fields });
+    return this.roleRepository.save({ id, ...fields });
   }
 
   async remove(id: number) {

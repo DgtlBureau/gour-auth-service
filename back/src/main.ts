@@ -7,7 +7,15 @@ import { AppModule } from './app.module';
 import { getRequiredEnvsByNodeEnv } from './common/utils/getRequiredEnvsByNodeEnv';
 import { NodeEnv } from './common/types/App';
 
-const envs = ['DB_HOST', 'DB_PORT', 'DB_USERNAME', 'DB_PASSWORD', 'DB_DATABASE'];
+const envs = [
+  'DB_HOST',
+  'DB_PORT',
+  'DB_USERNAME',
+  'DB_PASSWORD',
+  'DB_DATABASE',
+  'ACCESS_TOKEN_SECRET',
+  'REFRESH_TOKEN_SECRET',
+];
 
 const requiredEnvs = getRequiredEnvsByNodeEnv(
   { common: envs, development: ['SENTRY_DSN'], production: ['SENTRY_DSN'] },

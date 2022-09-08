@@ -1,23 +1,20 @@
 import * as jwt from 'jsonwebtoken';
 import { instanceToPlain } from 'class-transformer';
 
-const ACCESS_SECRET = process.env.ACCESS_TOKEN_SECRET;
-const REFRESH_SECRET = process.env.REFRESH_TOKEN_SECRET;
-
-export function encodeJwt(obj: object) {
-  return jwt.sign(instanceToPlain(obj), ACCESS_SECRET, {
+export function encodeJwt(obj: object, accessSecret: string) {
+  return jwt.sign(instanceToPlain(obj), accessSecret, {
     expiresIn: '15m',
   });
 }
 
-export function encodeRefreshJwt(obj: object) {
-  return jwt.sign(instanceToPlain(obj), REFRESH_SECRET, {
+export function encodeRefreshJwt(obj: object, refreshSecret: string) {
+  return jwt.sign(instanceToPlain(obj), refreshSecret, {
     expiresIn: '30d',
   });
 }
 
-export const verifyAccessJwt = (token: string) => verifyJwt(token, ACCESS_SECRET);
-export const verifyRefreshJwt = (token: string) => verifyJwt(token, REFRESH_SECRET);
+export const verifyAccessJwt = (token: string, accessSecret: string) => verifyJwt(token, accessSecret);
+export const verifyRefreshJwt = (token: string, refreshSecret: string) => verifyJwt(token, refreshSecret);
 
 function verifyJwt(token: string, secretKey: string): boolean {
   try {

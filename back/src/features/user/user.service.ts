@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, Repository } from 'typeorm';
+import { DeepPartial, In, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { User } from 'src/entity/User';
@@ -21,16 +21,12 @@ export class UserService {
   ) {}
 
   async getAllByRoles(roles: Role[]) {
-    const users = await this.userRepository.find();
-
-    if (!roles.length) return users;
-
-    return users
-      .filter((user) => user.roles.some((role) => roles.includes(role)))
-      .map(({ password: _, ...user }) => user);
+    return this.userRepository.find({
+      where: { role: In(roles) },
+    });
   }
 
-  async getOneById(id: number) {
+  async getOneById(id: number, params?: { withPassword: boolean }) {
     try {
       return this.userRepository.findOneOrFail(id);
     } catch {
@@ -49,33 +45,35 @@ export class UserService {
 
     if (dto.roleIds?.length) {
       for (const roleId of dto.roleIds) {
-        fields.roles.push(await this.roleService.findOne(roleId));
+        const role = await this.roleService.findOne(roleId);
+
+        fields.roles.push(role);
       }
     }
 
-    const { password: _, ...user } = await this.userRepository.save(fields);
-    return user;
+    return this.userRepository.save(fields);
   }
 
   async updateOne(id: number, { roleIds, ...userDto }: UpdateUserDto) {
     const candidate = await this.userRepository.findOne(id);
 
-    if (!candidate) {
-      throw new NotFoundException('Пользователь не найден');
-    }
+    if (!candidate) throw new NotFoundException('Пользователь не найден');
 
     const fields: DeepPartial<User> = formatFields<Partial<User>>(['login', 'name', 'password', 'isApproved'], userDto);
 
     if (roleIds) {
       fields.roles ??= [];
+
       for (const roleId of roleIds) {
-        fields.roles.push(await this.roleService.findOne(roleId));
+        const role = await this.roleService.findOne(roleId);
+
+        fields.roles.push(role);
       }
     }
+
     fields.password &&= await this.hashPassword(fields.password);
 
-    const { password: _, ...user } = await this.userRepository.save({ id, ...fields });
-    return user;
+    return this.userRepository.save({ id, ...fields });
   }
 
   async deleteOne(id: number) {

@@ -1,4 +1,6 @@
+import { Exclude } from 'class-transformer';
 import { Entity, Column, ManyToMany, JoinTable } from 'typeorm';
+
 import { AppEntity } from './Entity';
 import { Role } from './Role';
 
@@ -7,6 +9,7 @@ export class User extends AppEntity {
   @Column()
   login: string;
 
+  @Exclude()
   @Column()
   password: string;
 
