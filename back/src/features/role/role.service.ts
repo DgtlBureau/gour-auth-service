@@ -30,7 +30,7 @@ export class RoleService {
     try {
       return await this.roleRepository.save(fields);
     } catch (e) {
-      throw new BadRequestException('Роль с таким ключем уже существует');
+      throw new BadRequestException('Роль с таким ключом уже существует');
     }
   }
 
@@ -63,15 +63,14 @@ export class RoleService {
       }
     }
 
-    return this.roleRepository.save({ id, ...fields });
+    return await this.roleRepository.save({ id, ...fields });
   }
 
   async remove(id: number) {
     const { affected: deletedRows } = await this.roleRepository.delete(id);
 
-    if (!deletedRows) {
-      throw new BadRequestException('Роль не существует');
-    }
-    return {};
+    if (!deletedRows) throw new BadRequestException('Роль не существует');
+
+    return deletedRows;
   }
 }

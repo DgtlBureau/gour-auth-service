@@ -20,7 +20,7 @@ export class AccessService {
     try {
       return await this.accessRepository.save({ key, description });
     } catch {
-      throw new BadRequestException('Доступ с таким ключем уже существует');
+      throw new BadRequestException('Доступ с таким ключом уже существует');
     }
   }
 

@@ -32,8 +32,7 @@ export class UserService {
 
   async getOneById(id: number) {
     try {
-      const { password: _, ...user } = await this.userRepository.findOneOrFail(id);
-      return user;
+      return this.userRepository.findOneOrFail(id);
     } catch {
       throw new NotFoundException('Пользователь не найден');
     }
@@ -82,10 +81,9 @@ export class UserService {
   async deleteOne(id: number) {
     const { affected: deletedRows } = await this.userRepository.delete(id);
 
-    if (!deletedRows) {
-      throw new BadRequestException(`Пользователь не существует`);
-    }
-    return {}; // TODO: убрать возврат пустого объекта
+    if (!deletedRows) throw new BadRequestException(`Пользователь не существует`);
+
+    return deletedRows;
   }
 
   comparePasswords(pass: string, encrypted: string) {

@@ -14,7 +14,7 @@ export class RoleController {
   }
 
   @MessagePattern('get-role')
-  findOne(@Payload('uuid') id: number) {
+  findOne(@Payload() id: number) {
     return this.roleService.findOne(id);
   }
 
@@ -24,12 +24,12 @@ export class RoleController {
   }
 
   @MessagePattern('update-role')
-  update(@Payload('uuid') id: number, @Payload('dto') dto: UpdateRoleDto) {
+  update(@Payload('id') id: number, @Payload('dto') dto: UpdateRoleDto) {
     return this.roleService.update(id, dto);
   }
 
   @MessagePattern('delete-role')
-  remove(@Payload('uuid') id: number) {
+  remove(@Payload() id: number) {
     return this.roleService.remove(id);
   }
 }

@@ -1,5 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+
 import { AccessService } from './access.service';
 import { CreateAccessDto } from './dto/create-access.dto';
 import { UpdateAccessDto } from './dto/update-access.dto';
@@ -8,13 +9,13 @@ import { UpdateAccessDto } from './dto/update-access.dto';
 export class AccessController {
   constructor(private readonly accessService: AccessService) {}
 
-  @MessagePattern('get-all-access')
+  @MessagePattern('get-accesses')
   findAll() {
     return this.accessService.findAll();
   }
 
-  @MessagePattern('get-one-access')
-  findOne(@Payload('uuid') id: number) {
+  @MessagePattern('get-access')
+  findOne(@Payload() id: number) {
     return this.accessService.findOne(id);
   }
 
@@ -24,12 +25,12 @@ export class AccessController {
   }
 
   @MessagePattern('update-access')
-  update(@Payload('uuid') id: number, @Payload('dto') dto: UpdateAccessDto) {
+  update(@Payload('id') id: number, @Payload('dto') dto: UpdateAccessDto) {
     return this.accessService.update(id, dto);
   }
 
   @MessagePattern('delete-access')
-  remove(@Payload('uuid') id: number) {
+  remove(@Payload() id: number) {
     return this.accessService.remove(id);
   }
 }

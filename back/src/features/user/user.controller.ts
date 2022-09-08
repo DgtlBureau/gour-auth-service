@@ -15,8 +15,8 @@ export class UserController {
     return this.userService.getAllByRoles(roles);
   }
 
-  @MessagePattern('get-user-by-id')
-  getUserById(@Payload('uuid') id: number) {
+  @MessagePattern('get-user')
+  getUserById(@Payload() id: number) {
     return this.userService.getOneById(id);
   }
 
@@ -26,12 +26,12 @@ export class UserController {
   }
 
   @MessagePattern('update-user')
-  updateOne(@Payload('uuid') id: number, @Payload('dto') userDto: UpdateUserDto) {
-    return this.userService.updateOne(id, userDto);
+  updateOne(@Payload('id') id: number, @Payload('dto') dto: UpdateUserDto) {
+    return this.userService.updateOne(id, dto);
   }
 
   @MessagePattern('delete-user')
-  delete(@Payload('uuid') id: number) {
+  delete(@Payload() id: number) {
     return this.userService.deleteOne(id);
   }
 }

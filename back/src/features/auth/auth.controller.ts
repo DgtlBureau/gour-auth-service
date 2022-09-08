@@ -7,25 +7,32 @@ import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterWithoutPasswordUserDto } from './dto/register-user-without-password.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { ApiUser } from 'src/entity/ApiUser';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @MessagePattern('get-current-user')
+  getCurrentUser(@Payload() id: number) {
+    return this.authService.getCurrentUser(id);
+  }
+
   @MessagePattern('signup')
-  register(@Payload() userDto: RegisterWithoutPasswordUserDto) {
+  register(@Payload() dto: RegisterWithoutPasswordUserDto) {
     const password = generatePassword.generate();
-    return this.authService.register({ ...userDto, password });
+    return this.authService.register({ ...dto, password });
   }
 
   @MessagePattern('signup-without-password')
-  registerWithoutPassword(@Payload() userDto: RegisterUserDto) {
-    return this.authService.register(userDto);
+  registerWithoutPassword(@Payload() dto: RegisterUserDto) {
+    return this.authService.register(dto);
   }
 
   @MessagePattern('signin')
-  login(@Payload() userDto: LoginUserDto) {
-    return this.authService.login(userDto);
+  login(@Payload() dto: LoginUserDto) {
+    return this.authService.login(dto);
   }
 
   @MessagePattern('refresh')
@@ -35,11 +42,13 @@ export class AuthController {
 
   // TODO: /checkAccess
 
-  // @MessagePattern('change-password')
-  // changePassword() {}
+  @MessagePattern('change-password')
+  changePassword(@Payload('user') user: ApiUser, @Payload('dto') dto: ChangePasswordDto) {
+    return this.authService.changePassword(user.id, dto);
+  }
 
   @MessagePattern('check-token')
-  checkToken(token: string) {
+  checkToken(@Payload() token: string) {
     return {
       result: verifyAccessJwt(token),
     };

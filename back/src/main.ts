@@ -40,7 +40,8 @@ async function bootstrap() {
   }
 
   await app.listen();
-  console.log('AUTH SERVICE LISTEN: ', process.env.PORT);
+
+  console.log('AUTH SERVICE LISTEN:', process.env.PORT);
 }
 
 bootstrap();
