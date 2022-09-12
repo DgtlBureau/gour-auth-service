@@ -1,4 +1,6 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
 
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
@@ -6,10 +8,16 @@ import { UserService } from '../user/user.service';
 import { User } from 'src/entity/User';
 import { decodeToken, encodeJwt, encodeRefreshJwt } from './jwt.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { SendEmailDto } from './dto/send-email.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, @Inject('MESSAGES_SERVICE') private client: ClientProxy) {}
+
+  async onModuleInit() {
+    await this.client.connect();
+  }
 
   async login(loginDto: LoginUserDto) {
     const user = await this.userService.getOneByLogin(loginDto.login);
@@ -83,7 +91,41 @@ export class AuthService {
     return this.userService.updateOne(userId, { password: dto.password });
   }
 
+  async remindPassword(dto: ForgotPasswordDto) {
+    const candidate = await this.userService.getOneByLogin(dto.login);
+
+    if (!candidate) throw new NotFoundException('Пользователь не найден');
+
+    const password = '1234';
+
+    const updatedUser = await this.userService.updateOne(candidate.id, {
+      password,
+    });
+
+    if (!updatedUser) throw new BadRequestException('Не удалось изменить пароль');
+
+    try {
+      await this.sendEmail({
+        email: candidate.login,
+        subject: 'Восстановление пароля для входа в Dashboard Tastyoleg',
+        content: `Ваш пароль: ${password}`,
+      });
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException('Ошибка при отправке пароля');
+    }
+
+    return {
+      result: true,
+    };
+  }
+
   async getCurrentUser(userId: number) {
     return this.userService.getOneById(userId);
+  }
+
+  async sendEmail(dto: SendEmailDto) {
+    console.log('dto', dto);
+    return firstValueFrom(this.client.send('send-email', dto));
   }
 }

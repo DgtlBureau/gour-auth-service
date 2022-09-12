@@ -15,6 +15,8 @@ const envs = [
   'DB_DATABASE',
   'ACCESS_TOKEN_SECRET',
   'REFRESH_TOKEN_SECRET',
+  'MESSAGES_SERVICE_PORT',
+  'MESSAGES_SERVICE_HOST',
 ];
 
 const requiredEnvs = getRequiredEnvsByNodeEnv(

@@ -9,6 +9,7 @@ import { RegisterWithoutPasswordUserDto } from './dto/register-user-without-pass
 import { RegisterUserDto } from './dto/register-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { User } from 'src/entity/User';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -46,6 +47,11 @@ export class AuthController {
   @MessagePattern('change-password')
   changePassword(@Payload('user') user: User, @Payload('dto') dto: ChangePasswordDto) {
     return this.authService.changePassword(user.id, dto);
+  }
+
+  @MessagePattern('forgot-password')
+  remindPassword(@Payload() dto: ForgotPasswordDto) {
+    return this.authService.remindPassword(dto);
   }
 
   @MessagePattern('check-token')
