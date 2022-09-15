@@ -5,11 +5,11 @@ import {roleApi, Role} from "../api/roleApi";
 import {Form, Table} from "react-bootstrap";
 
 export function UserItem() {
-    const {uuid} = useParams<{ uuid: string }>();
+    const {id} = useParams<{ id: string }>();
     const [user, setUser] = useState<User | null>(null);
     const [rolees, setRolees] = useState<Role[]>([]);
     useEffect(() => {
-        userApi.getOne(uuid).then(setUser)
+        userApi.getOne(+id).then(setUser)
         roleApi.getAll().then(setRolees)
     }, [])
     if (!user) {
@@ -24,7 +24,7 @@ export function UserItem() {
         const updatedUser = {
             ...user,
             roles: [
-                ...user.roles.filter(it => it.uuid !== role.uuid),
+                ...user.roles.filter(it => it.id !== role.id),
                 role
             ]
         }
@@ -40,7 +40,7 @@ export function UserItem() {
 
         const updatedUser = {
             ...user,
-            roles: user.roles.filter(it => it.uuid !== role.uuid)
+            roles: user.roles.filter(it => it.id !== role.id)
         }
         userApi.update(updatedUser);
         setUser(updatedUser)
@@ -53,7 +53,7 @@ export function UserItem() {
             <tbody>
             {rolees.map(role => <RoleRow
                 role={role}
-                selected={user.roles.some(it => it.uuid === role.uuid)}
+                selected={user.roles.some(it => it.id === role.id)}
                 onChange={val => val ? selectRole(role) : unselectRole(role)}
             />)}
             </tbody>

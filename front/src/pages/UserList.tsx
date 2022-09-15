@@ -17,8 +17,8 @@ export function UserList() {
         userApi.getAll().then(setUsers)
     }, [])
 
-    function goToUser(userUuid: string) {
-        history.push('/users/' + userUuid);
+    function goToUser(userId: number) {
+        history.push('/users/' + userId);
     }
 
     async function createUser(user: Partial<User>) {
@@ -26,10 +26,10 @@ export function UserList() {
         setUsers([...users, savedUser]);
     }
 
-    async function deleteUser(userUuid: string) {
-        if(window.confirm('Уверены, что хотите удалить роль?')) {
-            await userApi.remove(userUuid);
-            setUsers(users.filter(it => it.uuid !== userUuid));
+    async function deleteUser(userId: number) {
+        if(window.confirm('Уверены, что хотите удалить пользователя?')) {
+            await userApi.remove(userId);
+            setUsers(users.filter(it => it.id !== userId));
         }
     }
 
@@ -48,8 +48,8 @@ export function UserList() {
             <tbody>
                 {users.map(user => <UserRow
                     user={user}
-                    onClick={() => goToUser(user.uuid)}
-                    onDelete={() => deleteUser(user.uuid)}
+                    onClick={() => goToUser(user.id)}
+                    onDelete={() => deleteUser(user.id)}
                 />)}
             </tbody>
         </Table>
