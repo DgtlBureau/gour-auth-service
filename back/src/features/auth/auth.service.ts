@@ -111,7 +111,7 @@ export class AuthService {
         content: `Ваш пароль: ${password}`,
       });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       throw new BadRequestException('Ошибка при отправке пароля');
     }
 
@@ -125,7 +125,6 @@ export class AuthService {
   }
 
   async sendEmail(dto: SendEmailDto) {
-    console.log('dto', dto);
     return firstValueFrom(this.client.send('send-email', dto));
   }
 }
