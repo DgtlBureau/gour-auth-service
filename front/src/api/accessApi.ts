@@ -1,4 +1,4 @@
-import axios from "axios";
+import $api from '../services/http';
 
 export type ApiAccess= {
     id: number;
@@ -8,26 +8,26 @@ export type ApiAccess= {
 
 export const accessApi = {
     async getAll(): Promise<ApiAccess[]> {
-        const {data: accesss} = await axios.get('/access')
+        const {data: accesss} = await $api.get('/accesses')
 
         return accesss;
     },
     async getOne(id: number): Promise<ApiAccess> {
-        const {data: access} = await axios.get('/access/' + id)
+        const {data: access} = await $api.get('/accesses/' + id)
 
         return access;
     },
     async update(access: Partial<ApiAccess> & {id: number}): Promise<ApiAccess> {
-        const {data: result} = await axios.put('/access/' + access.id, access)
+        const {data: result} = await $api.put('/accesses/' + access.id, access)
 
         return result;
     },
     async create(access: Partial<ApiAccess>): Promise<ApiAccess> {
-        const {data: result} = await axios.post('/access', access)
+        const {data: result} = await $api.post('/accesses', access)
 
         return result;
     },
     async remove(accessId: number) {
-        await axios.delete('/access/' + accessId)
+        await $api.delete('/accesses/' + accessId)
     }
 }

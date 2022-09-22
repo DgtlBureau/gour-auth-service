@@ -1,4 +1,4 @@
-import axios from "axios";
+import $api from '../services/http';
 import {ApiAccess} from "./accessApi";
 
 export type Role = {
@@ -17,12 +17,12 @@ type RoleDto = {
 
 export const roleApi = {
     async getAll(): Promise<Role[]> {
-        const {data: roles} = await axios.get('/role')
+        const {data: roles} = await $api.get('/roles')
 
         return roles;
     },
     async getOne(id: number): Promise<Role> {
-        const {data: role} = await axios.get('/role/' + id)
+        const {data: role} = await $api.get('/roles/' + id)
 
         return role;
     },
@@ -33,16 +33,16 @@ export const roleApi = {
         if (role.accesses) {
             body.accessIds = role.accesses.map(i => i.id);
         }
-        const {data: result} = await axios.put('/role/' + role.id, body);
+        const {data: result} = await $api.put('/roles/' + role.id, body);
 
         return result;
     },
     async create(role: Partial<Role>): Promise<Role> {
-        const {data: result} = await axios.post('/role', role)
+        const {data: result} = await $api.post('/roles', role)
 
         return result;
     },
     async remove(roleId: number) {
-        await axios.delete('/role/' + roleId)
+        await $api.delete('/roles/' + roleId)
     }
 }

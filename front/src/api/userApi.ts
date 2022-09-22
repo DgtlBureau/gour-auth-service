@@ -1,4 +1,4 @@
-import axios from "axios";
+import $api from '../services/http';
 import {Role} from "./roleApi";
 
 export type User = {
@@ -19,12 +19,12 @@ type UserDto = {
 
 export const userApi = {
     async getAll(): Promise<User[]> {
-        const {data: users} = await axios.get('/user')
+        const {data: users} = await $api.get('/users')
 
         return users;
     },
     async getOne(id: number): Promise<User> {
-        const {data: user} = await axios.get('/user/' + id)
+        const {data: user} = await $api.get('/users/' + id)
 
         return user;
     },
@@ -35,16 +35,16 @@ export const userApi = {
         if (user.roles) {
             body.roleIds = user.roles.map(i => i.id);
         }
-        const {data: result} = await axios.put('/user/' + user.id, body);
+        const {data: result} = await $api.put('/users/' + user.id, body);
 
         return result;
     },
     async create(user: Partial<User>): Promise<User> {
-        const {data: result} = await axios.post('/user', user)
+        const {data: result} = await $api.post('/users', user)
 
         return result;
     },
     async remove(userId: number) {
-        await axios.delete('/user/' + userId)
+        await $api.delete('/users/' + userId)
     }
 }

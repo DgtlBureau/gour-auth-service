@@ -21,9 +21,7 @@ export class UserService {
   ) {}
 
   async getAllByRoles(roles: Role[]) {
-    return this.userRepository.find({
-      where: { role: In(roles) },
-    });
+    return this.userRepository.find({}); // FIXME: нужен ли функционал поиска по ролям?
   }
 
   async getOneById(id: number, params?: { withPassword: boolean }) {
