@@ -1,7 +1,6 @@
 import {Button, Form, Table} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import {ApiAccess, accessApi} from "../api/accessApi";
-import {useHistory, useLocation} from "react-router-dom";
 
 const emptyAccess: Partial<ApiAccess> = {
     key: '',
@@ -10,25 +9,20 @@ const emptyAccess: Partial<ApiAccess> = {
 
 export function AccessList() {
     const [accesss, setAccesss] = useState<ApiAccess[]>([]);
-    const history = useHistory();
 
     useEffect(() => {
         accessApi.getAll().then(setAccesss)
     }, [])
-
-    function goToAccess(accessUuid: string) {
-        history.push('/accesss/' + accessUuid);
-    }
 
     async function createAccess(access: Partial<ApiAccess>) {
         const savedAccess = await accessApi.create(access);
         setAccesss([...accesss, savedAccess]);
     }
 
-    async function deleteAccess(accessUuid: string) {
-        if(window.confirm('Уверены, что хотите удалить роль?')) {
-            await accessApi.remove(accessUuid);
-            setAccesss(accesss.filter(it => it.uuid !== accessUuid));
+    async function deleteAccess(accessId: number) {
+        if(window.confirm('Уверены, что хотите удалить доступ?')) {
+            await accessApi.remove(accessId);
+            setAccesss(accesss.filter((it) => it.id !== accessId));
         }
     }
 
@@ -46,8 +40,7 @@ export function AccessList() {
             <tbody>
                 {accesss.map(access => <AccessRow
                     access={access}
-                    onClick={() => goToAccess(access.uuid)}
-                    onDelete={() => deleteAccess(access.uuid)}
+                    onDelete={() => deleteAccess(access.id)}
                 />)}
             <EditableRow
                 access={emptyAccess}
@@ -60,16 +53,12 @@ export function AccessList() {
 
 function AccessRow(props: {
     access: ApiAccess;
-    onClick(): void;
     onDelete(): void;
                  }) {
     return <tr>
         <td>{props.access.key}</td>
         <td>{props.access.description}</td>
         <td>
-            <Button onClick={props.onClick}>
-            Перейти
-            </Button>
             <Button onClick={props.onDelete} variant="danger">
                 Удалить
             </Button>
