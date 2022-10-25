@@ -48,6 +48,10 @@ export class RoleService {
     }
   }
 
+  async findOneByKey(key: string) {
+    return this.roleRepository.findOne({ where: { key } });
+  }
+
   async update(id: number, dto: UpdateRoleDto) {
     const role = await this.roleRepository.findOne(id);
 
