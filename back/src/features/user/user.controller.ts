@@ -1,7 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 
-import { Role } from 'src/entity/Role';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
@@ -10,9 +9,9 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @MessagePattern('get-users-by-roles')
-  getAllByRoles(@Payload() roles: Role[] = []) {
-    return this.userService.getAllByRoles(roles);
+  @MessagePattern('get-users')
+  getAll() {
+    return this.userService.getAll();
   }
 
   @MessagePattern('get-user')

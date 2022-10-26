@@ -7,7 +7,7 @@ export class LoginUserDto {
   @ApiProperty({ example: 'alex@gmail.com' })
   @IsEmail()
   @MaxLength(30)
-  readonly login: User['login'];
+  readonly email: User['login'];
 
   @ApiProperty()
   @IsString()

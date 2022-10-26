@@ -1,13 +1,12 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, In, Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { generate as generatePassword } from 'generate-password';
 
 import { User } from 'src/entity/User';
-import { Role } from 'src/entity/Role';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { formatFields } from 'src/utils/formatFields';
 import { RoleService } from '../role/role.service';
 
 const SALT = 5;
@@ -20,10 +19,11 @@ export class UserService {
     private roleService: RoleService,
   ) {}
 
-  async getAllByRoles(roles: Role[]) {
-    return this.userRepository.find({}); // FIXME: нужен ли функционал поиска по ролям?
+  async getAll() {
+    return this.userRepository.find();
   }
 
+  // TODO params
   async getOneById(id: number, params?: { withPassword: boolean }) {
     try {
       return this.userRepository.findOneOrFail(id);
@@ -36,42 +36,67 @@ export class UserService {
     return this.userRepository.findOne({ login });
   }
 
-  async create(dto: CreateUserDto) {
-    const fields: DeepPartial<User> = formatFields<Partial<User>>(['login', 'name', 'isApproved'], dto);
+  async create({ name, lastName, email, password, role: roleKey }: CreateUserDto) {
+    const candidate = await this.getOneByLogin(email);
 
-    fields.password = await this.hashPassword(dto.password);
+    if (candidate) throw new BadRequestException('Пользователь с таким логином уже существует');
 
-    if (dto.roleIds?.length) {
-      for (const roleId of dto.roleIds) {
-        const role = await this.roleService.findOne(roleId);
+    if (!password) password = generatePassword();
 
-        fields.roles.push(role);
-      }
-    }
+    const hashedPassword = await this.hashPassword(password);
 
-    return this.userRepository.save(fields);
+    const role = await this.roleService.findOneByKey(roleKey);
+
+    if (!role) throw new NotFoundException('Роль не найдена');
+
+    return this.userRepository.save({
+      login: email,
+      name: `${name} ${lastName}`,
+      password: hashedPassword,
+      roles: [role],
+    });
   }
 
-  async updateOne(id: number, { roleIds, ...userDto }: UpdateUserDto) {
+  async updateOne(id: number, { name, lastName, email, password, role: roleKey }: UpdateUserDto) {
     const candidate = await this.userRepository.findOne(id);
 
     if (!candidate) throw new NotFoundException('Пользователь не найден');
 
-    const fields: DeepPartial<User> = formatFields<Partial<User>>(['login', 'name', 'password', 'isApproved'], userDto);
+    const fields: DeepPartial<User> = {};
 
-    if (roleIds) {
-      fields.roles ??= [];
+    if (email) {
+      const user = await this.userRepository.findOne({ where: { login: email } });
 
-      for (const roleId of roleIds) {
-        const role = await this.roleService.findOne(roleId);
+      if (user) throw new BadRequestException('Пользователь с таким email уже существует');
 
-        fields.roles.push(role);
-      }
+      fields.login = email;
     }
 
-    fields.password &&= await this.hashPassword(fields.password);
+    if (name || lastName) {
+      const splitedName = candidate.name.split(' ');
+      const oldName = splitedName[0];
+      const oldLastName = splitedName[1];
 
-    return this.userRepository.save({ id, ...fields });
+      fields.name = `${name || oldName} ${lastName || oldLastName}`;
+    }
+
+    if (roleKey) {
+      fields.roles ??= [];
+
+      const role = await this.roleService.findOneByKey(roleKey);
+
+      if (!role) throw new NotFoundException('Роль не найдена');
+
+      fields.roles = [role];
+    }
+
+    if (password) {
+      const hashedPassword = await this.hashPassword(fields.password);
+
+      fields.password = hashedPassword;
+    }
+
+    return this.userRepository.save({ ...candidate, ...fields });
   }
 
   async deleteOne(id: number) {
