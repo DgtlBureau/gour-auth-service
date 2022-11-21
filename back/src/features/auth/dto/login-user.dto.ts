@@ -9,6 +9,7 @@ export class LoginUserDto {
   @MaxLength(30)
   readonly email: User['login'];
 
+
   @ApiProperty()
   @IsString()
   @MinLength(5)

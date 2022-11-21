@@ -23,7 +23,6 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  // TODO params
   async getOneById(id: number, params?: { withPassword: boolean }) {
     try {
       return this.userRepository.findOneOrFail(id);

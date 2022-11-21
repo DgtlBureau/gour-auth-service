@@ -2,6 +2,7 @@ import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { generate as generatePassword } from 'generate-password';
 
+
 import { verifyAccessJwt } from './jwt.service';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -24,6 +25,7 @@ export class AuthController {
     const password = generatePassword();
 
     return this.authService.register({ name, lastName, email, role, password });
+
   }
 
   @MessagePattern('signup-without-password')
