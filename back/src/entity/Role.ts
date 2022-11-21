@@ -1,13 +1,5 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToMany,
-  JoinTable,
-  Index,
-} from 'typeorm';
+import { Entity, Column, ManyToMany, JoinTable, Index } from 'typeorm';
+
 import { AppEntity } from './Entity';
 import { Access } from './Access';
 

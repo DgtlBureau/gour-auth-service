@@ -1,33 +1,25 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsBoolean, IsEmail, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import { User } from 'src/entity/User';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsOptional, IsString } from 'class-validator';
 
 export class CreateUserDto {
-  @ApiProperty({ example: 'alex@gmail.com' })
-  @IsEmail()
-  @MinLength(3)
-  @MaxLength(30)
-  readonly login: User['login'];
-
-  @ApiProperty({ example: 'alex_track' })
+  @ApiProperty()
   @IsString()
-  @MinLength(3)
-  @MaxLength(30)
-  readonly name: User['name'];
+  readonly name: string;
 
   @ApiProperty()
   @IsString()
-  @MinLength(5)
-  @MaxLength(30)
-  readonly password: User['password'];
+  readonly lastName: string;
 
-  @ApiPropertyOptional()
-  @IsBoolean()
-  @IsOptional()
-  readonly isApproved?: User['isApproved'];
+  @ApiProperty()
+  @IsEmail()
+  readonly email: string;
 
-  @ApiPropertyOptional()
-  @IsArray()
+  @ApiProperty()
+  @IsString()
   @IsOptional()
-  readonly roleIds?: number[];
+  readonly password?: string;
+
+  @ApiProperty()
+  @IsString()
+  readonly role: string;
 }

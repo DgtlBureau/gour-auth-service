@@ -6,17 +6,19 @@ import { UserService } from '../user/user.service';
 import { User } from 'src/entity/User';
 import { decodeToken, encodeJwt, encodeRefreshJwt } from './jwt.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { RoleService } from '../role/role.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private roleService: RoleService) {}
 
-  async login(loginDto: LoginUserDto) {
-    const user = await this.userService.getOneByLogin(loginDto.login);
+  async login(dto: LoginUserDto) {
+    const user = await this.userService.getOneByLogin(dto.email);
 
     if (!user) throw new UnauthorizedException('Неверный логин или пароль');
 
-    const isEqualPasswords = await this.userService.comparePasswords(loginDto.password, user.password);
+    const isEqualPasswords = await this.userService.comparePasswords(dto.password, user.password);
+
 
     if (!isEqualPasswords) throw new UnauthorizedException('Неверный логин или пароль');
 
@@ -28,12 +30,15 @@ export class AuthService {
     };
   }
 
-  async register(registerDto: RegisterUserDto) {
-    const candidate = await this.userService.getOneByLogin(registerDto.login);
+  async register({ name, lastName, email, role, password }: RegisterUserDto) {
+    const user = await this.userService.create({
+      name,
+      lastName,
+      email,
+      password,
+      role,
+    });
 
-    if (candidate) throw new BadRequestException('Пользователь с таким логином уже существует');
-
-    const user = await this.userService.create(registerDto);
     const tokens = this.signTokens(user);
 
     return {
