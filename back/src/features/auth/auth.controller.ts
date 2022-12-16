@@ -1,8 +1,8 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import generatePassword from 'generate-password';
+import { generate as generatePassword } from 'generate-password';
 
-import { verifyAccessJwt } from './jwt.service';
+import { verifyAccessJwt } from '../../common/services/jwt.service';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterWithoutPasswordUserDto } from './dto/register-user-without-password.dto';
@@ -10,21 +10,22 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { User } from 'src/entity/User';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { UserService } from '../user/user.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
 
   @MessagePattern('get-current-user')
   getCurrentUser(@Payload() id: number) {
-    return this.authService.getCurrentUser(id);
+    return this.userService.getOneById(id);
   }
 
   @MessagePattern('signup')
-  register(@Payload() dto: RegisterWithoutPasswordUserDto) {
-    const password = generatePassword.generate();
+  register(@Payload() { name, lastName, email, role }: RegisterWithoutPasswordUserDto) {
+    const password = generatePassword();
 
-    return this.authService.register({ ...dto, password });
+    return this.authService.register({ name, lastName, email, role, password });
   }
 
   @MessagePattern('signup-without-password')

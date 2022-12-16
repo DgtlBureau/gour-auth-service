@@ -1,33 +1,33 @@
-import axios from "axios";
+import $api from '../services/http';
 
-export type ApiAccess= {
-    id: number;
-    key: string;
-    description: string;
-}
+export type ApiAccess = {
+  id: number;
+  key: string;
+  description: string;
+};
 
 export const accessApi = {
-    async getAll(): Promise<ApiAccess[]> {
-        const {data: accesss} = await axios.get('/access')
+  async getAll(): Promise<ApiAccess[]> {
+    const { data: accesses } = await $api.get('/accesses');
 
-        return accesss;
-    },
-    async getOne(id: number): Promise<ApiAccess> {
-        const {data: access} = await axios.get('/access/' + id)
+    return accesses;
+  },
+  async getOne(id: number): Promise<ApiAccess> {
+    const { data: access } = await $api.get('/accesses/' + id);
 
-        return access;
-    },
-    async update(access: Partial<ApiAccess> & {id: number}): Promise<ApiAccess> {
-        const {data: result} = await axios.put('/access/' + access.id, access)
+    return access;
+  },
+  async update(access: Partial<ApiAccess> & { id: number }): Promise<ApiAccess> {
+    const { data: result } = await $api.put('/accesses/' + access.id, access);
 
-        return result;
-    },
-    async create(access: Partial<ApiAccess>): Promise<ApiAccess> {
-        const {data: result} = await axios.post('/access', access)
+    return result;
+  },
+  async create(access: Partial<ApiAccess>): Promise<ApiAccess> {
+    const { data: result } = await $api.post('/accesses', access);
 
-        return result;
-    },
-    async remove(accessId: number) {
-        await axios.delete('/access/' + accessId)
-    }
-}
+    return result;
+  },
+  async remove(accessId: number) {
+    await $api.delete('/accesses/' + accessId);
+  },
+};

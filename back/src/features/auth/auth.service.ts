@@ -1,30 +1,37 @@
 import { BadRequestException, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
+import { generate as generatePassword } from 'generate-password';
 
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UserService } from '../user/user.service';
 import { User } from 'src/entity/User';
-import { decodeToken, encodeJwt, encodeRefreshJwt } from './jwt.service';
+import { decodeToken, encodeJwt, encodeRefreshJwt } from '../../common/services/jwt.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { SendEmailDto } from './dto/send-email.dto';
+import { EmailService } from 'src/common/services/email.service';
+import { PasswordService } from 'src/common/services/password.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService, @Inject('MESSAGES_SERVICE') private client: ClientProxy) {}
+  constructor(
+    @Inject('MESSAGES_SERVICE') private client: ClientProxy,
+
+    private userService: UserService,
+    private emailService: EmailService,
+    private passService: PasswordService,
+  ) {}
 
   async onModuleInit() {
     await this.client.connect();
   }
 
-  async login(loginDto: LoginUserDto) {
-    const user = await this.userService.getOneByLogin(loginDto.login);
+  async login(dto: LoginUserDto) {
+    const user = await this.userService.getOneByLogin(dto.email);
 
     if (!user) throw new UnauthorizedException('Неверный логин или пароль');
 
-    const isEqualPasswords = await this.userService.comparePasswords(loginDto.password, user.password);
+    const isEqualPasswords = await this.passService.compare(dto.password, user.password);
 
     if (!isEqualPasswords) throw new UnauthorizedException('Неверный логин или пароль');
 
@@ -36,12 +43,15 @@ export class AuthService {
     };
   }
 
-  async register(registerDto: RegisterUserDto) {
-    const candidate = await this.userService.getOneByLogin(registerDto.login);
+  async register({ name, lastName, email, role, password }: RegisterUserDto) {
+    const user = await this.userService.create({
+      name,
+      lastName,
+      email,
+      password,
+      role,
+    });
 
-    if (candidate) throw new BadRequestException('Пользователь с таким логином уже существует');
-
-    const user = await this.userService.create(registerDto);
     const tokens = this.signTokens(user);
 
     return {
@@ -80,7 +90,7 @@ export class AuthService {
   async changePassword(userId: number, dto: ChangePasswordDto) {
     const candidate = await this.userService.getOneById(userId);
 
-    const isValidPrevPassword = this.userService.comparePasswords(dto.currentPassword, candidate.password);
+    const isValidPrevPassword = this.passService.compare(dto.currentPassword, candidate.password);
 
     if (!isValidPrevPassword) throw new BadRequestException('Прошлый пароль не совпадает');
 
@@ -88,7 +98,24 @@ export class AuthService {
 
     if (!isValidNewPassword) throw new BadRequestException('Пароли не совпадают');
 
-    return this.userService.updateOne(userId, { password: dto.password });
+    try {
+      await this.emailService.send({
+        email: candidate.login,
+        subject: 'Изменение пароля для входа в Dashboard Tastyoleg',
+        content: `Ваш новый пароль: ${dto.password}`,
+      });
+    } catch (error) {
+      console.error(error);
+      throw new BadRequestException('Ошибка при отправке пароля');
+    }
+
+    const updatedUser = await this.userService.update(userId, { password: dto.password });
+
+    if (!updatedUser) throw new BadRequestException('Не удалось изменить пароль');
+
+    return {
+      result: true,
+    };
   }
 
   async remindPassword(dto: ForgotPasswordDto) {
@@ -96,35 +123,28 @@ export class AuthService {
 
     if (!candidate) throw new NotFoundException('Пользователь не найден');
 
-    const password = '1234';
-
-    const updatedUser = await this.userService.updateOne(candidate.id, {
-      password,
-    });
-
-    if (!updatedUser) throw new BadRequestException('Не удалось изменить пароль');
+    const password = generatePassword();
+    const hashedPassword = await this.passService.hash(password);
 
     try {
-      await this.sendEmail({
+      await this.emailService.send({
         email: candidate.login,
         subject: 'Восстановление пароля для входа в Dashboard Tastyoleg',
-        content: `Ваш пароль: ${password}`,
+        content: `Ваш новый пароль: ${password}`,
       });
     } catch (error) {
       console.error(error);
       throw new BadRequestException('Ошибка при отправке пароля');
     }
 
+    const updatedUser = await this.userService.update(candidate.id, {
+      password: hashedPassword,
+    });
+
+    if (!updatedUser) throw new BadRequestException('Не удалось изменить пароль');
+
     return {
       result: true,
     };
-  }
-
-  async getCurrentUser(userId: number) {
-    return this.userService.getOneById(userId);
-  }
-
-  async sendEmail(dto: SendEmailDto) {
-    return firstValueFrom(this.client.send('send-email', dto));
   }
 }
