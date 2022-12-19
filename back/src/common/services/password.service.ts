@@ -4,7 +4,7 @@ import { generate as generatePassword, GenerateOptions } from 'generate-password
 
 @Injectable()
 export class PasswordService {
-  SALT = 5;
+  private SALT = 5;
 
   generate(options?: GenerateOptions) {
     return generatePassword(options);

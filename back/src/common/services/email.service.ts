@@ -1,13 +1,20 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { HttpService } from '@nestjs/axios';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
+
 import { SendEmailDto } from '../dto/send-email.dto';
 
 @Injectable()
 export class EmailService {
-  constructor(@Inject('MESSAGES_SERVICE') private client: ClientProxy) {}
+  constructor(private readonly httpService: HttpService) {}
 
   async send(dto: SendEmailDto) {
-    return firstValueFrom(this.client.send('send-email', dto));
+    const { data } = await firstValueFrom(
+      this.httpService.post(`${process.env.API_GATEWAY_URL}/messages/send-email`, dto),
+    );
+
+    if (!data) throw new InternalServerErrorException('Ошибка при отправке на почту');
+
+    return data;
   }
 }

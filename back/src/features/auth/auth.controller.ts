@@ -1,20 +1,24 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { generate as generatePassword } from 'generate-password';
 
 import { verifyAccessJwt } from '../../common/services/jwt.service';
 import { AuthService } from './auth.service';
-import { LoginUserDto } from './dto/login-user.dto';
-import { RegisterWithoutPasswordUserDto } from './dto/register-user-without-password.dto';
-import { RegisterUserDto } from './dto/register-user.dto';
+import { SignInDto } from './dto/signin.dto';
+import { SignUpWithoutPasswordDto } from './dto/signup-without-password.dto';
+import { SignUpDto } from './dto/signup.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { User } from 'src/entity/User';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { UserService } from '../user/user.service';
+import { PasswordService } from 'src/common/services/password.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+    private readonly passService: PasswordService,
+  ) {}
 
   @MessagePattern('get-current-user')
   getCurrentUser(@Payload() id: number) {
@@ -22,20 +26,20 @@ export class AuthController {
   }
 
   @MessagePattern('signup')
-  register(@Payload() { name, lastName, email, role }: RegisterWithoutPasswordUserDto) {
-    const password = generatePassword();
-
-    return this.authService.register({ name, lastName, email, role, password });
+  register(@Payload() dto: SignUpDto) {
+    return this.authService.signup(dto);
   }
 
   @MessagePattern('signup-without-password')
-  registerWithoutPassword(@Payload() dto: RegisterUserDto) {
-    return this.authService.register(dto);
+  registerWithoutPassword(@Payload() dto: SignUpWithoutPasswordDto) {
+    const password = this.passService.generate();
+
+    return this.authService.signup({ ...dto, password });
   }
 
   @MessagePattern('signin')
-  login(@Payload() dto: LoginUserDto) {
-    return this.authService.login(dto);
+  login(@Payload() dto: SignInDto) {
+    return this.authService.signin(dto);
   }
 
   @MessagePattern('refresh')

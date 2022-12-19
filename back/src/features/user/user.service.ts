@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, FindOneOptions, Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 
 import { User } from 'src/entity/User';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -27,10 +27,7 @@ export class UserService {
 
   async getOneById(id: number, params?: UserGetOneDto) {
     try {
-      const options: FindOneOptions<User> = {
-        relations: [params.withPassword && 'password'],
-      };
-      return this.userRepository.findOneOrFail(id, options);
+      return this.userRepository.findOneOrFail(id);
     } catch {
       throw new NotFoundException('Пользователь не найден');
     }
@@ -51,7 +48,7 @@ export class UserService {
 
     try {
       await this.emailService.send({
-        email: candidate.login,
+        email: login,
         subject: 'Пароль для входа в Dashboard Tastyoleg',
         content: `Ваш пароль: ${password}`,
       });
@@ -82,7 +79,7 @@ export class UserService {
     const fields: DeepPartial<User> = {};
 
     if (login) {
-      const user = await this.userRepository.findOne({ where: { login } });
+      const user = await this.userRepository.findOne({ login });
 
       if (user) throw new BadRequestException('Пользователь с таким email уже существует');
 
@@ -109,13 +106,13 @@ export class UserService {
     }
 
     if (password) {
-      const hashedPassword = await this.passService.hash(fields.password);
+      const hashedPassword = await this.passService.hash(password);
 
       try {
         await this.emailService.send({
           email: candidate.login,
           subject: 'Пароль для входа в Dashboard Tastyoleg',
-          content: `Ваш новый пароль: ${fields.password}`,
+          content: `Ваш новый пароль: ${password}`,
         });
       } catch (error) {
         console.error(error);
@@ -125,7 +122,7 @@ export class UserService {
       fields.password = hashedPassword;
     }
 
-    return this.userRepository.save({ ...candidate, ...fields });
+    return this.userRepository.save({ id, ...fields });
   }
 
   async delete(id: number) {

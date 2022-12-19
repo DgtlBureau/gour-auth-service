@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { HttpModule } from '@nestjs/axios';
 
 import { UserModule } from '../user/user.module';
 import { RoleModule } from '../role/role.module';
@@ -10,20 +10,7 @@ import { EmailService } from 'src/common/services/email.service';
 import { PasswordService } from 'src/common/services/password.service';
 
 @Module({
-  imports: [
-    ClientsModule.register([
-      {
-        name: 'MESSAGES_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: process.env.MESSAGES_SERVICE_HOST,
-          port: +process.env.MESSAGES_SERVICE_PORT,
-        },
-      },
-    ]),
-    UserModule,
-    RoleModule,
-  ],
+  imports: [UserModule, RoleModule, HttpModule.register({})],
   controllers: [AuthController],
   providers: [AuthService, UserService, EmailService, PasswordService],
 })
