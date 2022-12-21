@@ -3,16 +3,15 @@ import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 
 import { User } from 'src/entity/User';
 
-export class RegisterWithoutPasswordUserDto {
+export class SignInDto {
   @ApiProperty({ example: 'alex@gmail.com' })
   @IsEmail()
-  @MinLength(3)
   @MaxLength(30)
-  readonly login: User['login'];
+  readonly email: User['login'];
 
-  @ApiProperty({ example: 'alex_track' })
+  @ApiProperty()
   @IsString()
-  @MinLength(3)
+  @MinLength(5)
   @MaxLength(30)
-  readonly name: User['name'];
+  readonly password: User['password'];
 }

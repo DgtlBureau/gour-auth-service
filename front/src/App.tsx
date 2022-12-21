@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React from 'react';
 import './App.css';
 import "./styles/global.scss";
 import 'bootstrap/dist/css/bootstrap.min.css';

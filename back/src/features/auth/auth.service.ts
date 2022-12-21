@@ -1,22 +1,29 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 
-import { LoginUserDto } from './dto/login-user.dto';
-import { RegisterUserDto } from './dto/register-user.dto';
+import { SignInDto } from './dto/signin.dto';
+import { SignUpDto } from './dto/signup.dto';
 import { UserService } from '../user/user.service';
 import { User } from 'src/entity/User';
-import { decodeToken, encodeJwt, encodeRefreshJwt } from './jwt.service';
+import { decodeToken, encodeJwt, encodeRefreshJwt } from '../../common/services/jwt.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { EmailService } from 'src/common/services/email.service';
+import { PasswordService } from 'src/common/services/password.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private emailService: EmailService,
+    private passService: PasswordService,
+  ) {}
 
-  async login(loginDto: LoginUserDto) {
-    const user = await this.userService.getOneByLogin(loginDto.login);
+  async signin(dto: SignInDto) {
+    const user = await this.userService.getOneByLogin(dto.email);
 
     if (!user) throw new UnauthorizedException('Неверный логин или пароль');
 
-    const isEqualPasswords = await this.userService.comparePasswords(loginDto.password, user.password);
+    const isEqualPasswords = await this.passService.compare(dto.password, user.password);
 
     if (!isEqualPasswords) throw new UnauthorizedException('Неверный логин или пароль');
 
@@ -28,12 +35,15 @@ export class AuthService {
     };
   }
 
-  async register(registerDto: RegisterUserDto) {
-    const candidate = await this.userService.getOneByLogin(registerDto.login);
+  async signup({ name, lastName, email, role, password }: SignUpDto) {
+    const user = await this.userService.create({
+      name,
+      lastName,
+      email,
+      password,
+      role,
+    });
 
-    if (candidate) throw new BadRequestException('Пользователь с таким логином уже существует');
-
-    const user = await this.userService.create(registerDto);
     const tokens = this.signTokens(user);
 
     return {
@@ -72,7 +82,7 @@ export class AuthService {
   async changePassword(userId: number, dto: ChangePasswordDto) {
     const candidate = await this.userService.getOneById(userId);
 
-    const isValidPrevPassword = this.userService.comparePasswords(dto.currentPassword, candidate.password);
+    const isValidPrevPassword = this.passService.compare(dto.currentPassword, candidate.password);
 
     if (!isValidPrevPassword) throw new BadRequestException('Прошлый пароль не совпадает');
 
@@ -80,10 +90,41 @@ export class AuthService {
 
     if (!isValidNewPassword) throw new BadRequestException('Пароли не совпадают');
 
-    return this.userService.updateOne(userId, { password: dto.password });
+    try {
+      await this.emailService.send({
+        email: candidate.login,
+        subject: 'Изменение пароля для входа в Dashboard Tastyoleg',
+        content: `Ваш новый пароль: ${dto.password}`,
+      });
+    } catch (error) {
+      console.error(error);
+      throw new BadRequestException('Ошибка при отправке пароля');
+    }
+
+    const updatedUser = await this.userService.update(userId, { password: dto.password });
+
+    if (!updatedUser) throw new BadRequestException('Не удалось изменить пароль');
+
+    return {
+      result: true,
+    };
   }
 
-  async getCurrentUser(userId: number) {
-    return this.userService.getOneById(userId);
+  async remindPassword({ login }: ForgotPasswordDto) {
+    const candidate = await this.userService.getOneByLogin(login);
+
+    if (!candidate) throw new NotFoundException('Пользователь не найден');
+
+    const password = this.passService.generate();
+
+    const updatedUser = await this.userService.update(candidate.id, {
+      password,
+    });
+
+    if (!updatedUser) throw new BadRequestException('Не удалось изменить пароль');
+
+    return {
+      result: true,
+    };
   }
 }

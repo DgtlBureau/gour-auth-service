@@ -15,6 +15,9 @@ const envs = [
   'DB_DATABASE',
   'ACCESS_TOKEN_SECRET',
   'REFRESH_TOKEN_SECRET',
+  'MESSAGES_SERVICE_PORT',
+  'MESSAGES_SERVICE_HOST',
+  'API_GATEWAY_URL',
 ];
 
 const requiredEnvs = getRequiredEnvsByNodeEnv(
@@ -32,7 +35,7 @@ async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
     transport: Transport.TCP,
     options: {
-      host: 'localhost',
+      host: process.env.HOST,
       port: +process.env.PORT,
     },
   });
