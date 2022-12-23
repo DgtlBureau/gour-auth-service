@@ -1,30 +1,31 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
-import { generate as generatePassword } from 'generate-password';
 
 import { User } from 'src/entity/User';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RoleService } from '../role/role.service';
-
-const SALT = 5;
+import { UserGetOneDto } from './dto/user-get-one.dto';
+import { PasswordService } from 'src/common/services/password.service';
+import { EmailService } from 'src/common/services/email.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+
     private roleService: RoleService,
+    private passService: PasswordService,
+    private emailService: EmailService,
   ) {}
 
   async getAll() {
     return this.userRepository.find();
   }
 
-  // TODO params
-  async getOneById(id: number, params?: { withPassword: boolean }) {
+  async getOneById(id: number, params?: UserGetOneDto) {
     try {
       return this.userRepository.findOneOrFail(id);
     } catch {
@@ -36,48 +37,62 @@ export class UserService {
     return this.userRepository.findOne({ login });
   }
 
-  async create({ name, lastName, email, password, role: roleKey }: CreateUserDto) {
-    const candidate = await this.getOneByLogin(email);
+  async create({ name, lastName, email: login, password, role: roleKey }: CreateUserDto) {
+    const candidate = await this.getOneByLogin(login);
 
     if (candidate) throw new BadRequestException('Пользователь с таким логином уже существует');
 
-    if (!password) password = generatePassword();
+    if (!password) password = this.passService.generate();
 
-    const hashedPassword = await this.hashPassword(password);
+    const hashedPassword = await this.passService.hash(password);
+
+    try {
+      await this.emailService.send({
+        email: login,
+        subject: 'Пароль для входа в Dashboard Tastyoleg',
+        content: `Ваш пароль: ${password}`,
+      });
+    } catch (error) {
+      console.error(error);
+      throw new BadRequestException('Ошибка при отправке пароля');
+    }
 
     const role = await this.roleService.findOneByKey(roleKey);
 
     if (!role) throw new NotFoundException('Роль не найдена');
 
+    const fullName = `${name} ${lastName}`;
+
     return this.userRepository.save({
-      login: email,
-      name: `${name} ${lastName}`,
+      login,
+      name: fullName,
       password: hashedPassword,
       roles: [role],
     });
   }
 
-  async updateOne(id: number, { name, lastName, email, password, role: roleKey }: UpdateUserDto) {
+  async update(id: number, { name, lastName, email: login, password, role: roleKey }: UpdateUserDto) {
     const candidate = await this.userRepository.findOne(id);
 
     if (!candidate) throw new NotFoundException('Пользователь не найден');
 
     const fields: DeepPartial<User> = {};
 
-    if (email) {
-      const user = await this.userRepository.findOne({ where: { login: email } });
+    if (login) {
+      const user = await this.userRepository.findOne({ login });
 
       if (user) throw new BadRequestException('Пользователь с таким email уже существует');
 
-      fields.login = email;
+      fields.login = login;
     }
 
     if (name || lastName) {
       const splitedName = candidate.name.split(' ');
       const oldName = splitedName[0];
       const oldLastName = splitedName[1];
+      const fullName = `${name || oldName} ${lastName || oldLastName}`;
 
-      fields.name = `${name || oldName} ${lastName || oldLastName}`;
+      fields.name = fullName;
     }
 
     if (roleKey) {
@@ -91,27 +106,30 @@ export class UserService {
     }
 
     if (password) {
-      const hashedPassword = await this.hashPassword(fields.password);
+      const hashedPassword = await this.passService.hash(password);
+
+      try {
+        await this.emailService.send({
+          email: candidate.login,
+          subject: 'Пароль для входа в Dashboard Tastyoleg',
+          content: `Ваш новый пароль: ${password}`,
+        });
+      } catch (error) {
+        console.error(error);
+        throw new BadRequestException('Ошибка при отправке пароля');
+      }
 
       fields.password = hashedPassword;
     }
 
-    return this.userRepository.save({ ...candidate, ...fields });
+    return this.userRepository.save({ id, ...fields });
   }
 
-  async deleteOne(id: number) {
+  async delete(id: number) {
     const { affected: deletedRows } = await this.userRepository.delete(id);
 
     if (!deletedRows) throw new BadRequestException(`Пользователь не существует`);
 
     return deletedRows;
-  }
-
-  comparePasswords(pass: string, encrypted: string) {
-    return bcrypt.compare(pass, encrypted);
-  }
-
-  private hashPassword(pass: string) {
-    return bcrypt.hash(pass, SALT);
   }
 }

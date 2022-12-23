@@ -25,12 +25,12 @@ export class UserController {
   }
 
   @MessagePattern('update-user')
-  updateOne(@Payload('id') id: number, @Payload('dto') dto: UpdateUserDto) {
-    return this.userService.updateOne(id, dto);
+  update(@Payload('id') id: number, @Payload('dto') dto: UpdateUserDto) {
+    return this.userService.update(id, dto);
   }
 
   @MessagePattern('delete-user')
   delete(@Payload() id: number) {
-    return this.userService.deleteOne(id);
+    return this.userService.delete(id);
   }
 }
