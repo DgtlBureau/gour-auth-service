@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 
-import { verifyAccessJwt } from '../../common/services/jwt.service';
+import { verifyAccessJwt } from 'src/common/services/jwt.service';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/signin.dto';
 import { SignUpWithoutPasswordDto } from './dto/signup-without-password.dto';

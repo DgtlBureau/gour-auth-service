@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/node';
 const enableSentry = (err: unknown) => {
   Sentry.captureException(err);
   return throwError(() => err);
+
 };
 @Injectable()
 export class SentryInterceptor implements NestInterceptor {

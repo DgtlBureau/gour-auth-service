@@ -25,6 +25,7 @@ export class AuthService {
 
     const isEqualPasswords = await this.passService.compare(dto.password, user.password);
 
+
     if (!isEqualPasswords) throw new UnauthorizedException('Неверный логин или пароль');
 
     const tokens = this.signTokens(user);

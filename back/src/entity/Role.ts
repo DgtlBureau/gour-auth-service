@@ -1,4 +1,5 @@
 import { Entity, Column, ManyToMany, JoinTable, Index } from 'typeorm';
+
 import { AppEntity } from './Entity';
 import { Access } from './Access';
 
