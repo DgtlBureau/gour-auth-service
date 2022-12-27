@@ -3,7 +3,7 @@ import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 
 import { User } from 'src/entity/User';
 
-export class LoginUserDto {
+export class SignInDto {
   @ApiProperty({ example: 'alex@gmail.com' })
   @IsEmail()
   @MaxLength(30)
